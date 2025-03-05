@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Processador de Escolta/Preservação</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .table-container {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h2 class="mb-3">Processador de Dados de Escolta/Preservação</h2>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="inputText" class="form-label">Cole o texto aqui:</label>
+                    <textarea class="form-control" id="inputText" rows="10" placeholder="Cole o texto aqui..."></textarea>
+                </div>
+                <button class="btn btn-primary mb-3" onclick="processText()">Processar Texto</button>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="table-container">
+                    <table class="table table-striped table-bordered" id="outputTable">
+                        <thead>
+                            <tr>
+                                <th>Modalidade</th>
+                                <th>Empresa</th>
+                                <th>Origem</th>
+                                <th>Destino</th>
+                                <th>Data</th>
+                                <th>Horário</th>
+                                <th>Motorista</th>
+                                <th>Placa</th>
+                                <th>Telefone</th>
+                                <th>Agente</th>
+                                <th>Tel. Agente</th>
+                                <th>Veículo</th>
+                                <th>Placa Veículo</th>
+                                <th>Pedágio</th>
+                                <th>Km Ini</th>
+                                <th>Km Fim</th>
+                                <th>Total Km</th>
+                                <th>Hora Local</th>
+                                <th>Hora Início</th>
+                                <th>Hora Fim</th>
+                                <th>Total Hrs Op</th>
+                                <th>Total Hrs Ag</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+                <button class="btn btn-success mt-3" onclick="copyToClipboard()">Copiar para Excel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function processText() {
+            const text = document.getElementById('inputText').value;
+            const entries = text.split(/\n\s*\n/); // Separa por blocos de texto
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = '';
+
+            entries.forEach(entry => {
+                if (entry.trim()) {
+                    const lines = entry.split('\n');
+                    let data = {
+                        modalidade: '',
+                        empresa: '',
+                        origem: '',
+                        destino: '',
+                        data: '',
+                        horario: '',
+                        motorista: '',
+                        placa: '',
+                        telefone: '',
+                        agente: '',
+                        telAgente: '',
+                        veiculo: '',
+                        placaVeiculo: '',
+                        pedagio: '0,00',
+                        kmIni: '',
+                        kmFim: '',
+                        totalKm: '',
+                        horaLocal: '',
+                        horaInicio: '',
+                        horaFim: '',
+                        totalHrsOp: '',
+                        totalHrsAg: ''
+                    };
+
+                    // Primeira linha contém modalidade e empresa
+                    const firstLine = lines[0].split(' ');
+                    data.modalidade = firstLine[0];
+                    data.empresa = firstLine[1] || '';
+
+                    lines.forEach(line => {
+                        const [key, ...value] = line.split(': ');
+                        const val = value.join(': ').trim();
+                        
+                        if (line.startsWith('Origem:')) data.origem = val;
+                        else if (line.startsWith('Destino:')) data.destino = val;
+                        else if (line.startsWith('Data:')) data.data = val;
+                        else if (line.startsWith('Hora:')) data.horario = val;
+                        else if (line.startsWith('Motorista:')) data.motorista = val;
+                        else if (line.startsWith('Placa:')) data.placa = val;
+                        else if (line.startsWith('Telefone:')) data.telefone = val;
+                        else if (line.startsWith('Agente:')) data.agente = val;
+                        else if (line.startsWith('Telefones do agente:')) data.telAgente = val;
+                        else if (line.startsWith('Veículo utilizado:')) data.veiculo = val;
+                        else if (line.startsWith('Placa:')) data.placaVeiculo = data.placaVeiculo || val;
+                        else if (line.startsWith('Valor do pedágio:')) data.pedagio = val;
+                        else if (line.startsWith('Km inicial:')) data.kmIni = val;
+                        else if (line.startsWith('Km final:')) data.kmFim = val;
+                        else if (line.startsWith('Horário local do agente:')) data.horaLocal = val;
+                        else if (line.startsWith('Horário de início da operação:')) data.horaInicio = val;
+                        else if (line.startsWith('Horário de término da operação:')) data.horaFim = val;
+                        else if (line.startsWith('Total de horas da operação:')) data.totalHrsOp = val;
+                        else if (line.startsWith('Total de horas do agente:')) data.totalHrsAg = val;
+                    });
+
+                    // Calcular total de km automaticamente
+                    if (data.kmIni && data.kmFim) {
+                        data.totalKm = parseInt(data.kmFim) - parseInt(data.kmIni);
+                    }
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${data.modalidade}</td>
+                        <td>${data.empresa}</td>
+                        <td>${data.origem}</td>
+                        <td>${data.destino}</td>
+                        <td>${data.data}</td>
+                        <td>${data.horario}</td>
+                        <td>${data.motorista}</td>
+                        <td>${data.placa}</td>
+                        <td>${data.telefone}</td>
+                        <td>${data.agente}</td>
+                        <td>${data.telAgente}</td>
+                        <td>${data.veiculo}</td>
+                        <td>${data.placaVeiculo}</td>
+                        <td>${data.pedagio}</td>
+                        <td>${data.kmIni}</td>
+                        <td>${data.kmFim}</td>
+                        <td>${data.totalKm}</td>
+                        <td>${data.horaLocal}</td>
+                        <td>${data.horaInicio}</td>
+                        <td>${data.horaFim}</td>
+                        <td>${data.totalHrsOp}</td>
+                        <td>${data.totalHrsAg}</td>
+                    `;
+                    tableBody.appendChild(row);
+                }
+            });
+        }
+
+        function copyToClipboard() {
+            const table = document.getElementById('outputTable');
+            let tsv = [];
+            for (let i = 0; i < table.rows.length; i++) {
+                let row = [];
+                for (let j = 0; j < table.rows[i].cells.length; j++) {
+                    row.push(table.rows[i].cells[j].innerText);
+                }
+                tsv.push(row.join('\t'));
+            }
+            const tsvText = tsv.join('\n');
+            navigator.clipboard.writeText(tsvText)
+                .then(() => alert('Dados copiados para a área de transferência! Cole no Excel.'))
+                .catch(err => alert('Erro ao copiar: ' + err));
+        }
+    </script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
