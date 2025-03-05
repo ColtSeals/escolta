@@ -10,21 +10,40 @@
             max-height: 400px;
             overflow-y: auto;
         }
+        /* Ajustes para mobile */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            .table {
+                font-size: 12px;
+            }
+            th, td {
+                padding: 5px;
+            }
+            .btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            .table-container {
+                max-height: 300px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container mt-4">
-        <h2 class="mb-3">Processador de Dados de Escolta/Preservação</h2>
+        <h2 class="mb-3">Processador de Escolta/Preservação</h2>
         
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-12 col-md-6">
                 <div class="mb-3">
                     <label for="inputText" class="form-label">Cole o texto aqui:</label>
                     <textarea class="form-control" id="inputText" rows="10" placeholder="Cole o texto aqui..."></textarea>
                 </div>
-                <button class="btn btn-primary mb-3" onclick="processText()">Processar Texto</button>
+                <button class="btn btn-primary mb-3" id="processButton">Processar Texto</button>
             </div>
-            <div class="col-md-6">
+            <div class="col-12 col-md-6">
                 <div class="table-container">
                     <table class="table table-striped table-bordered" id="outputTable">
                         <thead>
@@ -56,18 +75,26 @@
                         <tbody></tbody>
                     </table>
                 </div>
-                <button class="btn btn-success mt-3" onclick="copyToClipboard()">Copiar para Excel</button>
+                <button class="btn btn-success mt-3" id="copyButton">Copiar para Excel</button>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        document.getElementById('processButton').addEventListener('click', processText);
+        document.getElementById('copyButton').addEventListener('click', copyToClipboard);
+
         function processText() {
             const text = document.getElementById('inputText').value;
+            if (!text) {
+                alert('Por favor, insira o texto antes de processar!');
+                return;
+            }
+
             const lines = text.split('\n').filter(line => line.trim() !== '');
             const tableBody = document.querySelector('#outputTable tbody');
-            tableBody.innerHTML = ''; // Limpa a tabela antes de processar
+            tableBody.innerHTML = ''; // Limpa a tabela
 
             let currentData = {};
             let agentes = [];
@@ -78,9 +105,8 @@
             lines.forEach((line, index) => {
                 line = line.trim();
 
-                // Detecta nova entrada
                 if (line.match(/^(ESCOLTA|PRESERVAÇÃO|ENVISION|SUPERSONIC)$/)) {
-                    if (Object.keys(currentData).length > 1) { // Se já houver dados coletados
+                    if (Object.keys(currentData).length > 1) {
                         processAgents(currentData, agentes, telefonesAgente, veiculos, placasVeiculos);
                     }
                     currentData = { Modalidade: line.split(' ')[0], Empresa: line.split(' ')[1] || '' };
@@ -89,7 +115,6 @@
                     veiculos = [];
                     placasVeiculos = [];
                 }
-                // Coleta de dados
                 else if (line.startsWith('Origem:')) currentData.Origem = line.replace('Origem: ', '');
                 else if (line.startsWith('Destino:')) currentData.Destino = line.replace('Destino: ', '');
                 else if (line.startsWith('Data:')) currentData.Data = line.replace('Data: ', '');
@@ -113,7 +138,6 @@
                 else if (line.startsWith('Total de horas da operação:')) currentData['Total Hrs Op.'] = line.replace('Total de horas da operação: ', '');
                 else if (line.startsWith('Total de horas do agente:')) currentData['Total Hrs Agente'] = line.replace('Total de horas do agente: ', '');
 
-                // Processa a última entrada ao chegar ao final das linhas
                 if (index === lines.length - 1 && Object.keys(currentData).length > 1) {
                     processAgents(currentData, agentes, telefonesAgente, veiculos, placasVeiculos);
                 }
@@ -121,7 +145,7 @@
         }
 
         function processAgents(data, agentes, telefonesAgente, veiculos, placasVeiculos) {
-            if (agentes.length === 0) agentes.push(''); // Garante pelo menos um agente vazio
+            if (agentes.length === 0) agentes.push(''); // Garante pelo menos um agente
 
             agentes.forEach((agente, index) => {
                 const rowData = { ...data };
@@ -130,7 +154,6 @@
                 rowData.Veículo = veiculos[index] || '';
                 rowData['Placa Veículo'] = placasVeiculos[index] || '';
 
-                // Calcula Total Km automaticamente se não estiver preenchido
                 if (!rowData['Total Km'] && rowData['Km Inicial'] && rowData['Km Final']) {
                     rowData['Total Km'] = rowData['Km Final'] - rowData['Km Inicial'];
                 }
@@ -171,6 +194,8 @@
 
             navigator.clipboard.writeText(tsv).then(() => {
                 alert('Dados copiados para a área de transferência! Cole no Excel com Ctrl+V');
+            }).catch(err => {
+                alert('Erro ao copiar: ' + err);
             });
         }
     </script>
