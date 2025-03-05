@@ -104,7 +104,6 @@
                         else if (line.startsWith('Placa:')) data.placa = line.replace('Placa: ', '');
                         else if (line.startsWith('Telefone:')) data.telefone = line.replace('Telefone: ', '');
                         else if (line.startsWith('Agente 1:')) {
-                            // Tratamento para o primeiro agente
                             const agente1Data = line.replace('Agente 1: ', '').split(' e ');
                             data.agente1 = agente1Data[0] || '';
                             data.agente2 = agente1Data[1] || '';
@@ -154,32 +153,4 @@
                     <td>${data.telefone}</td><td>${data.agente1}</td><td>${data.telefoneAgente1}</td>
                     <td>${data.agente2}</td><td>${data.telefoneAgente2}</td><td>${data.veiculoUtilizado}</td><td>${data.placaVeiculo || data.placa}</td>
                     <td>${data.valorPedagio}</td><td>${data.kmInicial}</td><td>${data.kmFinal}</td><td>${data.totalKm}</td>
-                    <td>${data.horarioLocalAgente}</td><td>${data.horarioInicio}</td><td>${data.horarioTermino}</td>
-                    <td>${data.totalHorasOperacao}</td><td>${data.totalHorasAgente}</td>
-                </tr>`;
-            });
-
-            tableHTML += '</tbody></table>';
-            document.getElementById('tableContainer').innerHTML = tableHTML;
-        }
-
-        function copyToClipboard() {
-            const table = document.querySelector('table');
-            if (!table) return alert('Gere a tabela primeiro!');
-
-            let tsv = [];
-            const rows = table.querySelectorAll('tr');
-            rows.forEach(row => {
-                const cols = row.querySelectorAll('td, th');
-                const rowData = Array.from(cols).map(col => col.textContent).join('\t');
-                tsv.push(rowData);
-            });
-
-            const tsvText = tsv.join('\n');
-            navigator.clipboard.writeText(tsvText)
-                .then(() => alert('Copiado para a área de transferência! Cole no Excel.'))
-                .catch(err => alert('Erro ao copiar: ' + err));
-        }
-    </script>
-</body>
-</html>
+                    <td>${data.horarioLo
