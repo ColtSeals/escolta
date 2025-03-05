@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabela de Dados de Operações</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        .button {
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Relatório de Operações</h2>
+        <button class="button" onclick="copyTable()">Copiar para Excel</button>
+
+        <table id="operationTable">
+            <thead>
+                <tr>
+                    <th>Modalidade</th>
+                    <th>Empresa</th>
+                    <th>Origem</th>
+                    <th>Destino</th>
+                    <th>Data</th>
+                    <th>Horário</th>
+                    <th>Motorista</th>
+                    <th>Placa</th>
+                    <th>Telefone</th>
+                    <th>Agentes</th>
+                    <th>Telefone do Agente</th>
+                    <th>Veículo Utilizado</th>
+                    <th>Placa Veículo</th>
+                    <th>Valor Pedágio</th>
+                    <th>Km Inicial</th>
+                    <th>Km Final</th>
+                    <th>Total de Km</th>
+                    <th>Horário Local do Agente</th>
+                    <th>Início da Operação</th>
+                    <th>Término da Operação</th>
+                    <th>Total de Horas da Operação</th>
+                    <th>Total de Horas do Agente</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>ESCOLTA</td>
+                    <td>ENVISION</td>
+                    <td>R. Rodolfo Gotardelo, 88 - Jardim das Bandeiras, Campinas - SP, 13051-115</td>
+                    <td>Ebazar - Cajamar/SP</td>
+                    <td>05/03/2025</td>
+                    <td>04:00</td>
+                    <td>Elias Araujo Souza</td>
+                    <td>IZZ-8A48</td>
+                    <td>19 97412-3034</td>
+                    <td>Henrique</td>
+                    <td>(11) 99505-0208</td>
+                    <td>CG FAN</td>
+                    <td>EHG-6548</td>
+                    <td>0,00</td>
+                    <td>19667</td>
+                    <td>19739</td>
+                    <td><span id="km1">0</span></td>
+                    <td>04:00</td>
+                    <td>04:12</td>
+                    <td>06:51</td>
+                    <td>02:39</td>
+                    <td>02:51</td>
+                </tr>
+                <tr>
+                    <td>PRESERVAÇÃO</td>
+                    <td>JRX</td>
+                    <td>Cajamar-SP</td>
+                    <td>Cajamar-SP</td>
+                    <td>11/12</td>
+                    <td>22:00</td>
+                    <td>Luciano Lopes</td>
+                    <td>GCS 4H47</td>
+                    <td>12 9 78123030 / 11 98656-0874</td>
+                    <td>Lucas do Santos Pereira</td>
+                    <td>1199912-5439</td>
+                    <td>Fox</td>
+                    <td>EJC-1022</td>
+                    <td>N/A</td>
+                    <td>N/A</td>
+                    <td>N/A</td>
+                    <td>N/A</td>
+                    <td>22:00</td>
+                    <td>22:00</td>
+                    <td>10:00</td>
+                    <td>12:00</td>
+                    <td>12:00</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function calculateTotalKm() {
+            const kmInicial = parseInt(document.querySelector('td:nth-child(15)').textContent);
+            const kmFinal = parseInt(document.querySelector('td:nth-child(16)').textContent);
+            const totalKm = kmFinal - kmInicial;
+            document.getElementById("km1").textContent = totalKm;
+        }
+
+        function copyTable() {
+            const table = document.getElementById("operationTable");
+            let range, selection;
+            
+            if (document.body.createTextRange) { // IE
+                range = document.body.createTextRange();
+                range.moveToElementText(table);
+                range.select();
+                document.execCommand("copy");
+            } else if (window.getSelection) { // Modern Browsers
+                selection = window.getSelection();
+                range = document.createRange();
+                range.selectNodeContents(table);
+                selection.removeAllRanges();
+                selection.addRange(range);
+                document.execCommand("copy");
+            }
+
+            alert("Tabela copiada para a área de transferência!");
+        }
+
+        window.onload = calculateTotalKm;
+    </script>
+</body>
+</html>
