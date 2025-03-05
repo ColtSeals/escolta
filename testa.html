@@ -103,14 +103,14 @@
                         else if (line.startsWith('Motorista:')) data.motorista = line.replace('Motorista: ', '');
                         else if (line.startsWith('Placa:')) data.placa = line.replace('Placa: ', '');
                         else if (line.startsWith('Telefone:')) data.telefone = line.replace('Telefone: ', '');
-                        else if (line.startsWith('Agente:')) {
-                            // Tratamento para um ou dois agentes
-                            const agentes = line.replace('Agente: ', '').split(' e ');
-                            data.agente1 = agentes[0] || '';
-                            data.agente2 = agentes[1] || '';
+                        else if (line.startsWith('Agente 1:')) {
+                            // Tratamento para o primeiro agente
+                            const agente1Data = line.replace('Agente 1: ', '').split(' e ');
+                            data.agente1 = agente1Data[0] || '';
+                            data.agente2 = agente1Data[1] || '';
                         }
-                        else if (line.startsWith('Telefones do agente:')) {
-                            const telefones = line.replace('Telefones do agente: ', '').split(' / ');
+                        else if (line.startsWith('Telefones do agente 1:')) {
+                            const telefones = line.replace('Telefones do agente 1: ', '').split(' / ');
                             data.telefoneAgente1 = telefones[0] || '';
                             data.telefoneAgente2 = telefones[1] || '';
                         }
