@@ -103,10 +103,8 @@
                         else if (line.startsWith('Motorista:')) data.motorista = line.replace('Motorista: ', '');
                         else if (line.startsWith('Placa:')) data.placa = line.replace('Placa: ', '');
                         else if (line.startsWith('Telefone:')) data.telefone = line.replace('Telefone: ', '');
-                        else if (line.startsWith('Agente 1:')) data.agente1 = line.replace('Agente 1: ', '');
-                        else if (line.startsWith('Telefones do agente 1:')) data.telefoneAgente1 = line.replace('Telefones do agente 1: ', '');
-                        else if (line.startsWith('Agente 2:')) data.agente2 = line.replace('Agente 2: ', '');
-                        else if (line.startsWith('Telefones do agente 2:')) data.telefoneAgente2 = line.replace('Telefones do agente 2: ', '');
+                        else if (line.startsWith('Agente:')) data.agente1 = line.replace('Agente: ', '');
+                        else if (line.startsWith('Telefones do agente:')) data.telefoneAgente1 = line.replace('Telefones do agente: ', '');
                         else if (line.startsWith('Veículo utilizado:')) data.veiculoUtilizado = line.replace('Veículo utilizado: ', '');
                         else if (line.startsWith('Placa:')) data.placaVeiculo = line.replace('Placa: ', '');
                         else if (line.startsWith('Valor do pedágio:')) data.valorPedagio = line.replace('Valor do pedágio: ', '');
@@ -120,6 +118,15 @@
                         else if (line.startsWith('Término:')) data.horarioTermino = line.replace('Término: ', '');
                         else if (line.startsWith('Total de horas da operação:')) data.totalHorasOperacao = line.replace('Total de horas da operação: ', '');
                         else if (line.startsWith('Total de horas do agente:')) data.totalHorasAgente = line.replace('Total de horas do agente: ', '');
+                        else if (line.startsWith('Veículos a serem preservados:')) {
+                            const vehicleData = lines[index + 1] || '';
+                            if (vehicleData.includes('Motorista:')) {
+                                data.motorista = vehicleData.replace('Motorista: ', '');
+                            }
+                            if (vehicleData.includes('Placa:')) {
+                                data.placa = vehicleData.replace('Placa: ', '');
+                            }
+                        }
                     }
                 });
 
