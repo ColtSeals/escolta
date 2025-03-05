@@ -140,11 +140,11 @@
                 });
 
                 // Calcular Total de KM se não estiver presente
-                if (!data.totalKm && data.kmInicial && data.kmFinal) {
+                if (data.kmInicial && data.kmFinal) {
                     const kmIni = parseInt(data.kmInicial);
                     const kmFim = parseInt(data.kmFinal);
                     if (!isNaN(kmIni) && !isNaN(kmFim)) {
-                        data.totalKm = kmFim - kmIni;
+                        data.totalKm = kmFim - kmIni; // Cálculo da diferença
                     }
                 }
 
