@@ -73,13 +73,18 @@
     </div>
 
     <script>
-        // Função para gerar a tabela
         function generateTable() {
-            console.log("Função generateTable chamada"); // Adiciona um log para depuração
-            const input = document.getElementById('inputText').value;
+            console.log("Função generateTable chamada");
+
+            const input = document.getElementById('inputText').value.trim();
+            if (!input) {
+                alert("Por favor, cole algum texto antes de gerar a tabela.");
+                return;
+            }
+
             const lines = input.split('\n');
             const tbody = document.querySelector('#outputTable tbody');
-            tbody.innerHTML = '';
+            tbody.innerHTML = '';  // Limpa a tabela antes de adicionar novos dados.
 
             let currentData = {};
             let entries = [];
@@ -148,6 +153,7 @@
                 entries.push(currentData);
             }
 
+            // Preenche a tabela com os dados coletados
             entries.forEach(entry => {
                 const totalKm = entry.kmFinal && entry.kmInicial ? entry.kmFinal - entry.kmInicial : '';
                 const row = document.createElement('tr');
