@@ -67,7 +67,7 @@
             const text = document.getElementById('inputText').value;
             const lines = text.split('\n').filter(line => line.trim() !== '');
             const tableBody = document.querySelector('#outputTable tbody');
-            tableBody.innerHTML = '';
+            tableBody.innerHTML = ''; // Limpa a tabela antes de processar
 
             let currentData = {};
             let agentes = [];
@@ -75,12 +75,12 @@
             let veiculos = [];
             let placasVeiculos = [];
 
-            lines.forEach(line => {
+            lines.forEach((line, index) => {
                 line = line.trim();
 
-                // Início de nova entrada
+                // Detecta nova entrada
                 if (line.match(/^(ESCOLTA|PRESERVAÇÃO|ENVISION|SUPERSONIC)$/)) {
-                    if (Object.keys(currentData).length > 0) {
+                    if (Object.keys(currentData).length > 1) { // Se já houver dados coletados
                         processAgents(currentData, agentes, telefonesAgente, veiculos, placasVeiculos);
                     }
                     currentData = { Modalidade: line.split(' ')[0], Empresa: line.split(' ')[1] || '' };
@@ -89,25 +89,20 @@
                     veiculos = [];
                     placasVeiculos = [];
                 }
+                // Coleta de dados
                 else if (line.startsWith('Origem:')) currentData.Origem = line.replace('Origem: ', '');
                 else if (line.startsWith('Destino:')) currentData.Destino = line.replace('Destino: ', '');
                 else if (line.startsWith('Data:')) currentData.Data = line.replace('Data: ', '');
                 else if (line.startsWith('Hora:')) currentData.Horario = line.replace('Hora: ', '');
                 else if (line.startsWith('Motorista:')) currentData.Motorista = line.replace('Motorista: ', '');
-                else if (line.startsWith('Placa:') && !veiculos.length) currentData.Placa = line.replace('Placa: ', '');
-                else if (line.startsWith('Telefone:') && !telefonesAgente.length) currentData.Telefone = line.replace('Telefone: ', '');
-                else if (line.startsWith('Agente:')) {
-                    agentes = line.replace('Agente: ', '').split(' e ');
-                }
-                else if (line.startsWith('Telefones do agente:') || (line.startsWith('Telefone:') && agentes.length)) {
+                else if (line.startsWith('Placa:') && veiculos.length === 0) currentData.Placa = line.replace('Placa: ', '');
+                else if (line.startsWith('Telefone:') && telefonesAgente.length === 0) currentData.Telefone = line.replace('Telefone: ', '');
+                else if (line.startsWith('Agente:')) agentes = line.replace('Agente: ', '').split(' e ').map(a => a.trim());
+                else if (line.startsWith('Telefones do agente:') || (line.startsWith('Telefone:') && agentes.length > 0)) {
                     telefonesAgente.push(line.replace(/Telefones do agente: |Telefone: /, ''));
                 }
-                else if (line.startsWith('Veículo utilizado:')) {
-                    veiculos.push(line.replace('Veículo utilizado: ', ''));
-                }
-                else if (line.startsWith('Placa:') && veiculos.length) {
-                    placasVeiculos.push(line.replace('Placa: ', ''));
-                }
+                else if (line.startsWith('Veículo utilizado:')) veiculos.push(line.replace('Veículo utilizado: ', ''));
+                else if (line.startsWith('Placa:') && veiculos.length > 0) placasVeiculos.push(line.replace('Placa: ', ''));
                 else if (line.startsWith('Valor do pedágio:')) currentData['Valor Pedágio'] = line.replace('Valor do pedágio: ', '');
                 else if (line.startsWith('Km inicial:')) currentData['Km Inicial'] = parseInt(line.replace('Km inicial: ', '')) || 0;
                 else if (line.startsWith('Km final:')) currentData['Km Final'] = parseInt(line.replace('Km final: ', '')) || 0;
@@ -117,16 +112,16 @@
                 else if (line.startsWith('Horário de término da operação:')) currentData['Término Op.'] = line.replace('Horário de término da operação: ', '');
                 else if (line.startsWith('Total de horas da operação:')) currentData['Total Hrs Op.'] = line.replace('Total de horas da operação: ', '');
                 else if (line.startsWith('Total de horas do agente:')) currentData['Total Hrs Agente'] = line.replace('Total de horas do agente: ', '');
-            });
 
-            // Processar a última entrada
-            if (Object.keys(currentData).length > 0) {
-                processAgents(currentData, agentes, telefonesAgente, veiculos, placasVeiculos);
-            }
+                // Processa a última entrada ao chegar ao final das linhas
+                if (index === lines.length - 1 && Object.keys(currentData).length > 1) {
+                    processAgents(currentData, agentes, telefonesAgente, veiculos, placasVeiculos);
+                }
+            });
         }
 
         function processAgents(data, agentes, telefonesAgente, veiculos, placasVeiculos) {
-            if (agentes.length === 0) agentes.push(''); // Caso não haja agente
+            if (agentes.length === 0) agentes.push(''); // Garante pelo menos um agente vazio
 
             agentes.forEach((agente, index) => {
                 const rowData = { ...data };
@@ -135,7 +130,7 @@
                 rowData.Veículo = veiculos[index] || '';
                 rowData['Placa Veículo'] = placasVeiculos[index] || '';
 
-                // Calcular Total Km automaticamente se não estiver preenchido
+                // Calcula Total Km automaticamente se não estiver preenchido
                 if (!rowData['Total Km'] && rowData['Km Inicial'] && rowData['Km Final']) {
                     rowData['Total Km'] = rowData['Km Final'] - rowData['Km Inicial'];
                 }
