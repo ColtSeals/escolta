@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inserir Dados e Gerar Tabela</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        .form-container {
+            margin-bottom: 20px;
+        }
+        .input-field {
+            display: block;
+            margin-bottom: 10px;
+            padding: 8px;
+            width: 100%;
+        }
+        .button {
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+        .copy-button {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Inserir Dados e Gerar Tabela</h2>
+    
+    <!-- Formulário para inserir os dados -->
+    <div class="form-container">
+        <label for="modalidade">Modalidade (ESCOLTA ou PRESERVAÇÃO):</label>
+        <input type="text" id="modalidade" class="input-field">
+
+        <label for="empresa">Empresa:</label>
+        <input type="text" id="empresa" class="input-field">
+
+        <label for="origem">Origem:</label>
+        <input type="text" id="origem" class="input-field">
+
+        <label for="destino">Destino:</label>
+        <input type="text" id="destino" class="input-field">
+
+        <label for="data">Data:</label>
+        <input type="text" id="data" class="input-field">
+
+        <label for="horario">Horário:</label>
+        <input type="text" id="horario" class="input-field">
+
+        <label for="motorista">Motorista:</label>
+        <input type="text" id="motorista" class="input-field">
+
+        <label for="placa">Placa:</label>
+        <input type="text" id="placa" class="input-field">
+
+        <label for="telefone">Telefone:</label>
+        <input type="text" id="telefone" class="input-field">
+
+        <label for="agente">Agente (separar por "e" se houver mais de 1):</label>
+        <input type="text" id="agente" class="input-field">
+
+        <label for="telefoneAgente">Telefone do Agente:</label>
+        <input type="text" id="telefoneAgente" class="input-field">
+
+        <label for="veiculo">Veículo Utilizado:</label>
+        <input type="text" id="veiculo" class="input-field">
+
+        <label for="placaVeiculo">Placa do Veículo:</label>
+        <input type="text" id="placaVeiculo" class="input-field">
+
+        <label for="valorPedagio">Valor do Pedágio:</label>
+        <input type="text" id="valorPedagio" class="input-field">
+
+        <label for="kmInicial">Km Inicial:</label>
+        <input type="number" id="kmInicial" class="input-field">
+
+        <label for="kmFinal">Km Final:</label>
+        <input type="number" id="kmFinal" class="input-field">
+
+        <label for="horaInicio">Hora de Início da Operação:</label>
+        <input type="text" id="horaInicio" class="input-field">
+
+        <label for="horaTermino">Hora de Término da Operação:</label>
+        <input type="text" id="horaTermino" class="input-field">
+
+        <button class="button" onclick="gerarTabela()">Gerar Tabela</button>
+    </div>
+
+    <!-- Tabela gerada dinamicamente -->
+    <div id="tabelaContainer"></div>
+
+    <!-- Botão para copiar a tabela -->
+    <button class="button copy-button" onclick="copyTable()">Copiar para Excel</button>
+
+    <script>
+        // Função para calcular o total de km
+        function calcularKm(kmInicial, kmFinal) {
+            return kmFinal - kmInicial;
+        }
+
+        // Função para gerar a tabela dinamicamente
+        function gerarTabela() {
+            const modalidade = document.getElementById('modalidade').value;
+            const empresa = document.getElementById('empresa').value;
+            const origem = document.getElementById('origem').value;
+            const destino = document.getElementById('destino').value;
+            const data = document.getElementById('data').value;
+            const horario = document.getElementById('horario').value;
+            const motorista = document.getElementById('motorista').value;
+            const placa = document.getElementById('placa').value;
+            const telefone = document.getElementById('telefone').value;
+            const agente = document.getElementById('agente').value;
+            const telefoneAgente = document.getElementById('telefoneAgente').value;
+            const veiculo = document.getElementById('veiculo').value;
+            const placaVeiculo = document.getElementById('placaVeiculo').value;
+            const valorPedagio = document.getElementById('valorPedagio').value;
+            const kmInicial = parseInt(document.getElementById('kmInicial').value);
+            const kmFinal = parseInt(document.getElementById('kmFinal').value);
+            const horaInicio = document.getElementById('horaInicio').value;
+            const horaTermino = document.getElementById('horaTermino').value;
+
+            const totalKm = calcularKm(kmInicial, kmFinal);
+
+            const tabelaContainer = document.getElementById('tabelaContainer');
+            tabelaContainer.innerHTML = `
+                <table id="operationTable">
+                    <thead>
+                        <tr>
+                            <th>Modalidade</th>
+                            <th>Empresa</th>
+                            <th>Origem</th>
+                            <th>Destino</th>
+                            <th>Data</th>
+                            <th>Horário</th>
+                            <th>Motorista</th>
+                            <th>Placa</th>
+                            <th>Telefone</th>
+                            <th>Agentes</th>
+                            <th>Telefone do Agente</th>
+                            <th>Veículo Utilizado</th>
+                            <th>Placa Veículo</th>
+                            <th>Valor do Pedágio</th>
+                            <th>Km Inicial</th>
+                            <th>Km Final</th>
+                            <th>Total de Km</th>
+                            <th>Hora de Início</th>
+                            <th>Hora de Término</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>${modalidade}</td>
+                            <td>${empresa}</td>
+                            <td>${origem}</td>
+                            <td>${destino}</td>
+                            <td>${data}</td>
+                            <td>${horario}</td>
+                            <td>${motorista}</td>
+                            <td>${placa}</td>
+                            <td>${telefone}</td>
+                            <td>${agente}</td>
+                            <td>${telefoneAgente}</td>
+                            <td>${veiculo}</td>
+                            <td>${placaVeiculo}</td>
+                            <td>${valorPedagio}</td>
+                            <td>${kmInicial}</td>
+                            <td>${kmFinal}</td>
+                            <td>${totalKm}</td>
+                            <td>${horaInicio}</td>
+                            <td>${horaTermino}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            `;
+        }
+
+        // Função para copiar a tabela para a área de transferência
+        function copyTable() {
+            const table = document.getElementById("operationTable");
+            let range, selection;
+            
+            if (document.body.createTextRange) { // IE
+                range = document.body.createTextRange();
+                range.moveToElementText(table);
+                range.select();
+                document.execCommand("copy");
+            } else if (window.getSelection) { // Modern Browsers
+                selection = window.getSelection();
+                range = document.createRange();
+                range.selectNodeContents(table);
+                selection.removeAllRanges();
+                selection.addRange(range);
+                document.execCommand("copy");
+            }
+
+            alert("Tabela copiada para a área de transferência!");
+        }
+    </script>
+</body>
+</html>
