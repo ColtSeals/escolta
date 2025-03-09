@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário de Escorta e Preservação</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+
+<div class="container mt-5">
+    <h2>Formulário de Escorta e Preservação</h2>
+    <div class="row">
+        <div class="col-md-12">
+            <label for="inputTexto" class="form-label">Cole o Texto Aqui</label>
+            <textarea id="inputTexto" class="form-control" rows="10"></textarea>
+        </div>
+        <div class="col-md-12 mt-3">
+            <button class="btn btn-primary" onclick="processarTexto()">Processar Dados</button>
+        </div>
+    </div>
+
+    <!-- Tabela de Resultados -->
+    <div class="mt-4">
+        <h4>Dados Processados</h4>
+        <table class="table table-bordered" id="tabelaDados">
+            <thead>
+                <tr>
+                    <th>Modalidade</th>
+                    <th>Empresa</th>
+                    <th>Origem</th>
+                    <th>Destino</th>
+                    <th>Data</th>
+                    <th>Hora</th>
+                    <th>Motorista</th>
+                    <th>Placa</th>
+                    <th>Telefone</th>
+                    <th>Agente 1</th>
+                    <th>Telefone do Agente 1</th>
+                    <th>Agente 2</th>
+                    <th>Telefone do Agente 2</th>
+                    <th>Veículo Utilizado</th>
+                    <th>Placa do Veículo</th>
+                    <th>Valor do Pedágio</th>
+                    <th>Km Inicial</th>
+                    <th>Km Final</th>
+                    <th>Total de Km</th>
+                    <th>Horário Local do Agente</th>
+                    <th>Horário de Início da Operação</th>
+                    <th>Horário de Término da Operação</th>
+                    <th>Total de Horas da Operação</th>
+                    <th>Total de Horas do Agente</th>
+                </tr>
+            </thead>
+            <tbody id="dadosTabela">
+                <!-- Dados serão inseridos aqui -->
+            </tbody>
+        </table>
+
+        <!-- Botão para copiar a tabela -->
+        <button class="btn btn-success" onclick="copiarTabela()">Copiar para Excel</button>
+    </div>
+</div>
+
+<script>
+    function processarTexto() {
+        const texto = document.getElementById("inputTexto").value;
+        const linhas = texto.split("\n");
+        const dados = [];
+
+        // Regex para encontrar os dados de Agente(s) e Telefone(s) do Agente(s)
+        const regexAgente = /(Agente(?:\s\d*)?:\s*([A-Za-z\s]+(?:\s*e\s*[A-Za-z\s]+)?))/;
+        const regexTelefoneAgente = /(Telefone(s*)\sdo\sagente(s*)\s?:\s*([\d\s\/]+))/;
+        let dadosOperacao = {};
+
+        for (let linha of linhas) {
+            if (linha.includes("ESCOLTA") || linha.includes("PRESERVAÇÃO")) {
+                if (Object.keys(dadosOperacao).length > 0) {
+                    dados.push(dadosOperacao);
+                }
+                dadosOperacao = { Modalidade: linha.split(" ")[0] };
+            } else if (linha.includes("Origem:")) {
+                dadosOperacao.Origem = linha.split(":")[1].trim();
+            } else if (linha.includes("Destino:")) {
+                dadosOperacao.Destino = linha.split(":")[1].trim();
+            } else if (linha.includes("Data:")) {
+                dadosOperacao.Data = linha.split(":")[1].trim();
+            } else if (linha.includes("Hora:")) {
+                dadosOperacao.Hora = linha.split(":")[1].trim();
+            } else if (linha.includes("Motorista:")) {
+                dadosOperacao.Motorista = linha.split(":")[1].trim();
+            } else if (linha.includes("Placa:") && !linha.includes("Telefone:")) {
+                dadosOperacao.Placa = linha.split(":")[1].trim();
+            } else if (linha.includes("Telefone:") && linha.indexOf("Telefone do agente") === -1) {
+                dadosOperacao.Telefone = linha.split(":")[1].trim();
+            } else if (linha.match(regexAgente)) {
+                const agentes = linha.match(regexAgente);
+                const agentesSplit = agentes[2] ? agentes[2].split(" e ") : [];
+                dadosOperacao.Agente1 = agentesSplit[0] || '';
+                dadosOperacao.Agente2 = agentesSplit[1] || '';
+            } else if (linha.match(regexTelefoneAgente)) {
+                const telefonesAgente = linha.match(regexTelefoneAgente);
+                const telefonesSplit = telefonesAgente[4] ? telefonesAgente[4].split(" / ") : [];
+                dadosOperacao.TelefoneAgente1 = telefonesSplit[0] || '';
+                dadosOperacao.TelefoneAgente2 = telefonesSplit[1] || '';
+            } else if (linha.includes("Veículo utilizado:")) {
+                dadosOperacao.VeiculoUtilizado = linha.split(":")[1].trim();
+            } else if (linha.includes("Placa do veículo:")) {
+                dadosOperacao.PlacaVeiculo = linha.split(":")[1].trim();
+            } else if (linha.includes("Valor do pedágio:")) {
+                dadosOperacao.ValorPedagio = linha.split(":")[1].trim();
+            } else if (linha.includes("Km inicial:")) {
+                dadosOperacao.KmInicial = parseInt(linha.split(":")[1].trim());
+            } else if (linha.includes("Km final:")) {
+                dadosOperacao.KmFinal = parseInt(linha.split(":")[1].trim());
+            } else if (linha.includes("Total de km:")) {
+                dadosOperacao.TotalKm = parseInt(linha.split(":")[1].trim());
+            } else if (linha.includes("Horário local do agente:")) {
+                dadosOperacao.HorarioLocalAgente = linha.split(":")[1].trim();
+            } else if (linha.includes("Horário de início da operação:")) {
+                dadosOperacao.HorarioInicioOperacao = linha.split(":")[1].trim();
+            } else if (linha.includes("Horário de término da operação:")) {
+                dadosOperacao.HorarioTerminoOperacao = linha.split(":")[1].trim();
+            } else if (linha.includes("Total de horas da operação:")) {
+                dadosOperacao.TotalHorasOperacao = linha.split(":")[1].trim();
+            } else if (linha.includes("Total de horas do agente:")) {
+                dadosOperacao.TotalHorasAgente = linha.split(":")[1].trim();
+            }
+        }
+
+        if (Object.keys(dadosOperacao).length > 0) {
+            dados.push(dadosOperacao);
+        }
+
+        // Preencher a tabela
+        preencherTabela(dados);
+    }
+
+    function preencherTabela(dados) {
+        const tbody = document.getElementById("dadosTabela");
+        tbody.innerHTML = ''; // Limpar tabela
+
+        dados.forEach(dado => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${dado.Modalidade}</td>
+                <td>${dado.Empresa || ''}</td>
+                <td>${dado.Origem}</td>
+                <td>${dado.Destino}</td>
+                <td>${dado.Data}</td>
+                <td>${dado.Hora}</td>
+                <td>${dado.Motorista}</td>
+                <td>${dado.Placa}</td>
+                <td>${dado.Telefone}</td>
+                <td>${dado.Agente1}</td>
+                <td>${dado.TelefoneAgente1}</td>
+                <td>${dado.Agente2 || ''}</td>
+                <td>${dado.TelefoneAgente2 || ''}</td>
+                <td>${dado.VeiculoUtilizado}</td>
+                <td>${dado.PlacaVeiculo || ''}</td>
+                <td>${dado.ValorPedagio}</td>
+                <td>${dado.KmInicial}</td>
+                <td>${dado.KmFinal}</td>
+                <td>${dado.TotalKm}</td>
+                <td>${dado.HorarioLocalAgente}</td>
+                <td>${dado.HorarioInicioOperacao}</td>
+                <td>${dado.HorarioTerminoOperacao}</td>
+                <td>${dado.TotalHorasOperacao}</td>
+                <td>${dado.TotalHorasAgente}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function copiarTabela() {
+        const tabela = document.getElementById('tabelaDados');
+        const range = document.createRange();
+        range.selectNodeContents(tabela);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        document.execCommand('copy');
+        alert('Dados copiados para a área de transferência!');
+    }
+</script>
+
+</body>
+</html>
