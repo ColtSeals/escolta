@@ -56,6 +56,7 @@
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow-x: auto; /* Habilita rolagem horizontal */
         }
         table {
             width: 100%;
@@ -68,7 +69,7 @@
         th, td {
             padding: 10px;
             text-align: left;
-            white-space: nowrap; /* Prevent text from wrapping */
+            white-space: nowrap; /* Evita que o texto se quebre em várias linhas */
         }
         th {
             background-color: #f2f2f2;
@@ -85,30 +86,13 @@
             background-color: #0056b3;
         }
 
-        /* Responsividade */
+        /* Responsividade - Adicionando rolagem horizontal */
         @media screen and (max-width: 768px) {
-            table, th, td {
-                font-size: 12px;
-                padding: 8px;
+            .table-container {
+                overflow-x: auto; /* Adiciona rolagem horizontal */
             }
-            th, td {
-                display: block;
-                width: 100%;
-                box-sizing: border-box;
-                text-align: right;
-            }
-            td {
-                text-align: left;
-                padding-left: 10px;
-                padding-right: 10px;
-            }
-            th {
-                background-color: #f9f9f9;
-            }
-            .table-actions {
-                flex-direction: column;
-                align-items: center;
-                margin-top: 10px;
+            table {
+                min-width: 1200px; /* Impede que a tabela fique muito compacta */
             }
         }
     </style>
