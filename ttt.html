@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Gerador de Tabela</title>
+    <style>
+        .form-container {
+            margin: 20px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+        .result-table {
+            margin: 20px;
+            display: none;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        button {
+            margin: 5px;
+            padding: 5px 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <div id="inputs">
+            <div class="input-group" id="input-0">
+                <h3>Categoria</h3>
+                <input type="text" placeholder="Nome da Empresa"><br>
+                <input type="text" placeholder="Data"><br>
+                <input type="text" placeholder="Hora"><br>
+                <h3>Origem/Destino</h3>
+                <input type="text" placeholder="Origem"><br>
+                <input type="text" placeholder="Destino"><br>
+                <input type="text" placeholder="Local"><br>
+                <h3>Motorista</h3>
+                <input type="text" placeholder="Motorista"><br>
+                <input type="text" placeholder="Telefone"><br>
+                <input type="text" placeholder="Placa do Cavalo"><br>
+                <input type="text" placeholder="Placa da Carreta"><br>
+                <input type="text" placeholder="Motivo"><br>
+                <input type="text" placeholder="Transportadora"><br>
+                <h3>Agente 1</h3>
+                <input type="text" placeholder="Agente 1"><br>
+                <input type="text" placeholder="Telefone do Agente 1"><br>
+                <input type="text" placeholder="Veículo Utilizado"><br>
+                <input type="text" placeholder="Placa"><br>
+                <h3>Agente 2</h3>
+                <input type="text" placeholder="Agente 2"><br>
+                <input type="text" placeholder="Telefone do Agente 2"><br>
+                <input type="text" placeholder="Veículo Utilizado"><br>
+                <input type="text" placeholder="Placa"><br>
+                <h3>Agente 3</h3>
+                <input type="text" placeholder="Agente 3"><br>
+                <input type="text" placeholder="Telefone do Agente 3"><br>
+                <input type="text" placeholder="Veículo Utilizado"><br>
+                <input type="text" placeholder="Placa"><br>
+                <h3>Detalhes da Operação</h3>
+                <input type="text" placeholder="Valor do Pedágio"><br>
+                <input type="text" placeholder="Km Inicial"><br>
+                <input type="text" placeholder="Km Final"><br>
+                <input type="text" placeholder="Total de Km"><br>
+                <input type="text" placeholder="Horário Local do Agente"><br>
+                <input type="text" placeholder="Horário de Início da Operação"><br>
+                <input type="text" placeholder="Horário de Término da Operação"><br>
+                <input type="text" placeholder="Total de Horas da Operação"><br>
+                <input type="text" placeholder="Total de Horas do Agente"><br>
+                <input type="text" placeholder="Manifesto"><br>
+            </div>
+        </div>
+        <button onclick="addInput()">+</button>
+        <button onclick="generateTable()">Gerar Excel</button>
+    </div>
+
+    <div class="result-table" id="result">
+        <button onclick="copyData()">Copiar Dados</button>
+        <table id="resultTable">
+            <thead>
+                <tr>
+                    <th>Nome da Empresa</th><th>Data</th><th>Hora</th>
+                    <th>Origem</th><th>Destino</th><th>Local</th>
+                    <th>Motorista</th><th>Telefone</th><th>Placa do Cavalo</th>
+                    <th>Placa da Carreta</th><th>Motivo</th><th>Transportadora</th>
+                    <th>Agente 1</th><th>Telefone do Agente 1</th><th>Veículo Utilizado</th><th>Placa</th>
+                    <th>Agente 2</th><th>Telefone do Agente 2</th><th>Veículo Utilizado</th><th>Placa</th>
+                    <th>Agente 3</th><th>Telefone do Agente 3</th><th>Veículo Utilizado</th><th>Placa</th>
+                    <th>Valor do Pedágio</th><th>Km Inicial</th><th>Km Final</th><th>Total de Km</th>
+                    <th>Horário Local do Agente</th><th>Horário de Início</th><th>Horário de Término</th>
+                    <th>Total de Horas da Operação</th><th>Total de Horas do Agente</th><th>Manifesto</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+
+    <script>
+        let inputCount = 1;
+
+        function addInput() {
+            const inputsDiv = document.getElementById('inputs');
+            const newInput = document.getElementById('input-0').cloneNode(true);
+            newInput.id = `input-${inputCount++}`;
+            const inputs = newInput.getElementsByTagName('input');
+            for (let input of inputs) {
+                input.value = '';
+            }
+            inputsDiv.appendChild(newInput);
+        }
+
+        function generateTable() {
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = '';
+            const inputGroups = document.getElementsByClassName('input-group');
+            
+            for (let group of inputGroups) {
+                const inputs = group.getElementsByTagName('input');
+                const row = document.createElement('tr');
+                for (let input of inputs) {
+                    const cell = document.createElement('td');
+                    cell.textContent = input.value || '';
+                    row.appendChild(cell);
+                }
+                tableBody.appendChild(row);
+            }
+            
+            document.getElementById('result').style.display = 'block';
+        }
+
+        function copyData() {
+            const tableBody = document.getElementById('tableBody');
+            const rows = tableBody.getElementsByTagName('tr');
+            let text = '';
+            
+            for (let row of rows) {
+                const cells = row.getElementsByTagName('td');
+                let rowText = '';
+                for (let cell of cells) {
+                    rowText += cell.textContent + '\t';
+                }
+                text += rowText.trim() + '\n';
+            }
+            
+            navigator.clipboard.writeText(text.trim())
+                .then(() => alert('Dados copiados para a área de transferência!'))
+                .catch(err => alert('Erro ao copiar: ' + err));
+        }
+    </script>
+</body>
+</html>
