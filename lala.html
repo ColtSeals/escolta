@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário de Operação</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+        }
+        .form-container {
+            margin-bottom: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .table-container {
+            margin-top: 20px;
+            display: none;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Formulário de Operação</h1>
+
+        <!-- Formulário de entrada de dados -->
+        <div class="form-container">
+            <label for="textareaInput">Cole os dados aqui:</label><br>
+            <textarea id="textareaInput"></textarea><br>
+            <button onclick="adicionarFormulario()">Adicionar Novo</button>
+        </div>
+
+        <!-- Área para gerar a tabela -->
+        <div class="table-container" id="tabelaContainer">
+            <h2>Tabela Gerada</h2>
+            <table id="tabelaOperacao">
+                <thead>
+                    <tr>
+                        <th>Categoria</th>
+                        <th>Nome da Empresa</th>
+                        <th>Data</th>
+                        <th>Hora</th>
+                        <th>Origem</th>
+                        <th>Destino</th>
+                        <th>Local</th>
+                        <th>Motorista</th>
+                        <th>Telefone</th>
+                        <th>Placa do Cavalo</th>
+                        <th>Placa da Carreta</th>
+                        <th>Motivo</th>
+                        <th>Transportadora</th>
+                        <th>Agente 1</th>
+                        <th>Telefone Agente 1</th>
+                        <th>Veículo Agente 1</th>
+                        <th>Placa Agente 1</th>
+                        <th>Agente 2</th>
+                        <th>Telefone Agente 2</th>
+                        <th>Veículo Agente 2</th>
+                        <th>Placa Agente 2</th>
+                        <th>Agente 3</th>
+                        <th>Telefone Agente 3</th>
+                        <th>Veículo Agente 3</th>
+                        <th>Placa Agente 3</th>
+                        <th>Valor do Pedágio</th>
+                        <th>Km Inicial</th>
+                        <th>Km Final</th>
+                        <th>Total de Km</th>
+                        <th>Horário Local do Agente</th>
+                        <th>Horário de Início da Operação</th>
+                        <th>Horário de Término da Operação</th>
+                        <th>Total de Horas da Operação</th>
+                        <th>Total de Horas do Agente</th>
+                        <th>Manifesto</th>
+                    </tr>
+                </thead>
+                <tbody id="corpoTabela">
+                </tbody>
+            </table>
+            <button onclick="gerarExcel()">Gerar Excel</button>
+            <button onclick="copiarTabela()">Copiar Dados</button>
+        </div>
+    </div>
+
+    <script>
+        function adicionarFormulario() {
+            const textoInput = document.getElementById('textareaInput').value;
+            const linhas = textoInput.split('\n');
+            const dados = {};
+
+            // Atribuir os dados ao objeto de forma estruturada
+            dados.categoria = linhas[0]?.split(':')[1]?.trim() || '';
+            dados.nomeEmpresa = linhas[1]?.split(':')[1]?.trim() || '';
+            dados.data = linhas[2]?.split(':')[1]?.trim() || '';
+            dados.hora = linhas[3]?.split(':')[1]?.trim() || '';
+            dados.origem = linhas[4]?.split(':')[1]?.trim() || '';
+            dados.destino = linhas[5]?.split(':')[1]?.trim() || '';
+            dados.local = linhas[6]?.split(':')[1]?.trim() || '';
+            dados.motorista = linhas[7]?.split(':')[1]?.trim() || '';
+            dados.telefone = linhas[8]?.split(':')[1]?.trim() || '';
+            dados.placaCavalo = linhas[9]?.split(':')[1]?.trim() || '';
+            dados.placaCarreta = linhas[10]?.split(':')[1]?.trim() || '';
+            dados.motivo = linhas[11]?.split(':')[1]?.trim() || '';
+            dados.transportadora = linhas[12]?.split(':')[1]?.trim() || '';
+            dados.agente1 = linhas[13]?.split(':')[1]?.trim() || '';
+            dados.telefoneAgente1 = linhas[14]?.split(':')[1]?.trim() || '';
+            dados.veiculoAgente1 = linhas[15]?.split(':')[1]?.trim() || '';
+            dados.placaAgente1 = linhas[16]?.split(':')[1]?.trim() || '';
+            dados.agente2 = linhas[17]?.split(':')[1]?.trim() || '';
+            dados.telefoneAgente2 = linhas[18]?.split(':')[1]?.trim() || '';
+            dados.veiculoAgente2 = linhas[19]?.split(':')[1]?.trim() || '';
+            dados.placaAgente2 = linhas[20]?.split(':')[1]?.trim() || '';
+            dados.agente3 = linhas[21]?.split(':')[1]?.trim() || '';
+            dados.telefoneAgente3 = linhas[22]?.split(':')[1]?.trim() || '';
+            dados.veiculoAgente3 = linhas[23]?.split(':')[1]?.trim() || '';
+            dados.placaAgente3 = linhas[24]?.split(':')[1]?.trim() || '';
+            dados.valorPedagio = linhas[25]?.split(':')[1]?.trim() || '';
+            dados.kmInicial = linhas[26]?.split(':')[1]?.trim() || '';
+            dados.kmFinal = linhas[27]?.split(':')[1]?.trim() || '';
+            dados.totalKm = linhas[28]?.split(':')[1]?.trim() || '';
+            dados.horarioLocalAgente = linhas[29]?.split(':')[1]?.trim() || '';
+            dados.horarioInicioOperacao = linhas[30]?.split(':')[1]?.trim() || '';
+            dados.horarioTerminoOperacao = linhas[31]?.split(':')[1]?.trim() || '';
+            dados.totalHorasOperacao = linhas[32]?.split(':')[1]?.trim() || '';
+            dados.totalHorasAgente = linhas[33]?.split(':')[1]?.trim() || '';
+            dados.manifesto = linhas[34]?.split(':')[1]?.trim() || '';
+
+            // Adicionar os dados ao corpo da tabela
+            const corpoTabela = document.getElementById('corpoTabela');
+            const novaLinha = document.createElement('tr');
+
+            Object.values(dados).forEach(valor => {
+                const td = document.createElement('td');
+                td.textContent = valor;
+                novaLinha.appendChild(td);
+            });
+
+            corpoTabela.appendChild(novaLinha);
+            document.getElementById('textareaInput').value = ''; // Limpar o textarea após o envio
+            document.getElementById('tabelaContainer').style.display = 'block';
+        }
+
+        function gerarExcel() {
+            const tabela = document.getElementById('tabelaOperacao');
+            const wb = XLSX.utils.table_to_book(tabela, { sheet: "Dados Operação" });
+            XLSX.writeFile(wb, "operacao.xlsx");
+        }
+
+        function copiarTabela() {
+            const tabela = document.getElementById('tabelaOperacao');
+            const range = document.createRange();
+            range.selectNode(tabela);
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(range);
+            document.execCommand('copy');
+        }
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+</body>
+</html>
