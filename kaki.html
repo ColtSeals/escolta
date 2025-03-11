@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Gerador de Tabela para Excel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            margin-bottom: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            margin-bottom: 10px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        button {
+            margin-right: 10px;
+            padding: 5px 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="inputs">
+        <div class="container">
+            <textarea placeholder="Cole o texto aqui"></textarea>
+        </div>
+    </div>
+    <button onclick="addInput()">+</button>
+    <button onclick="generateTable()">Gerar Excel</button>
+    <button onclick="copyTableData()" id="copyBtn" style="display: none;">Copiar Dados</button>
+    
+    <div id="tableContainer"></div>
+
+    <script>
+        const headers = [
+            'Categoria', 'Nome da Empresa', 'Data', 'Hora', 'Origem', 'Destino', 'Local',
+            'Motorista', 'Telefone', 'Placa do Cavalo', 'Placa da Carreta', 'Motivo', 'Transportadora',
+            'Agente 1', 'Telefone do Agente 1', 'Veículo Utilizado 1', 'Placa 1',
+            'Agente 2', 'Telefone do Agente 2', 'Veículo Utilizado 2', 'Placa 2',
+            'Agente 3', 'Telefone do Agente 3', 'Veículo Utilizado 3', 'Placa 3',
+            'Valor do Pedágio', 'Km Inicial', 'Km Final', 'Total de Km',
+            'Horário Local do Agente', 'Horário de Início da Operação', 'Horário de Término da Operação',
+            'Total de Horas da Operação', 'Total de Horas do Agente', 'Manifesto'
+        ];
+
+        function addInput() {
+            const div = document.createElement('div');
+            div.className = 'container';
+            div.innerHTML = '<textarea placeholder="Cole o texto aqui"></textarea>';
+            document.getElementById('inputs').appendChild(div);
+        }
+
+        function parseText(text) {
+            const lines = text.split('\n');
+            const data = {};
+            
+            lines.forEach(line => {
+                const [key, value] = line.split(':');
+                if (key && value) {
+                    let cleanKey = key.trim();
+                    // Ajustar nomes dos agentes e seus campos
+                    if (cleanKey.startsWith('Agente') && cleanKey.length > 6) {
+                        cleanKey = `Agente ${cleanKey.match(/\d+/)[0]}`;
+                    } else if (cleanKey.startsWith('Telefone do Agente')) {
+                        cleanKey = `Telefone do Agente ${cleanKey.match(/\d+/)[0]}`;
+                    } else if (cleanKey.startsWith('Veículo Utilizado') && cleanKey.match(/\d+/)) {
+                        cleanKey = `Veículo Utilizado ${cleanKey.match(/\d+/)[0]}`;
+                    } else if (cleanKey.startsWith('Placa') && cleanKey.match(/\d+/)) {
+                        cleanKey = `Placa ${cleanKey.match(/\d+/)[0]}`;
+                    }
+                    data[cleanKey] = value.trim();
+                }
+            });
+            return data;
+        }
+
+        function generateTable() {
+            const textareas = document.querySelectorAll('textarea');
+            const allData = [];
+            
+            textareas.forEach(textarea => {
+                if (textarea.value.trim()) {
+                    allData.push(parseText(textarea.value));
+                }
+            });
+
+            if (allData.length === 0) {
+                alert('Por favor, insira pelo menos um texto!');
+                return;
+            }
+
+            const table = document.createElement('table');
+            const thead = document.createElement('thead');
+            const tbody = document.createElement('tbody');
+            
+            // Criar cabeçalho
+            const headerRow = document.createElement('tr');
+            headers.forEach(header => {
+                const th = document.createElement('th');
+                th.textContent = header;
+                headerRow.appendChild(th);
+            });
+            thead.appendChild(headerRow);
+
+            // Criar linhas de dados
+            allData.forEach(data => {
+                const row = document.createElement('tr');
+                headers.forEach(header => {
+                    const td = document.createElement('td');
+                    td.textContent = data[header] || '';
+                    row.appendChild(td);
+                });
+                tbody.appendChild(row);
+            });
+
+            table.appendChild(thead);
+            table.appendChild(tbody);
+            
+            const container = document.getElementById('tableContainer');
+            container.innerHTML = '';
+            container.appendChild(table);
+            
+            document.getElementById('copyBtn').style.display = 'inline';
+        }
+
+        function copyTableData() {
+            const tbody = document.querySelector('tbody');
+            if (!tbody) return;
+
+            let text = '';
+            const rows = tbody.querySelectorAll('tr');
+            
+            rows.forEach((row, rowIndex) => {
+                const cells = row.querySelectorAll('td');
+                const rowData = Array.from(cells).map(cell => cell.textContent);
+                text += rowData.join('\t');
+                if (rowIndex < rows.length - 1) text += '\n';
+            });
+
+            navigator.clipboard.writeText(text)
+                .then(() => alert('Dados copiados para a área de transferência!'))
+                .catch(err => alert('Erro ao copiar: ' + err));
+        }
+    </script>
+</body>
+</html>
