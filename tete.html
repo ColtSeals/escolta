@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário de Operação</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7fa;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 90%;
+            margin: 50px auto;
+            padding: 0 15px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .form-container {
+            margin-bottom: 20px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .table-container {
+            margin-top: 30px;
+            display: none;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow-x: auto; /* Habilita rolagem horizontal */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            white-space: nowrap; /* Evita que o texto se quebre em várias linhas */
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .table-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        .table-actions button {
+            background-color: #007BFF;
+        }
+        .table-actions button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Responsividade - Adicionando rolagem horizontal */
+        @media screen and (max-width: 768px) {
+            .table-container {
+                overflow-x: auto; /* Adiciona rolagem horizontal */
+            }
+            table {
+                min-width: 1200px; /* Impede que a tabela fique muito compacta */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Formulário de Operação</h1>
+
+        <!-- Formulário de entrada de dados -->
+        <div class="form-container">
+            <label for="textareaInput">Cole os dados aqui:</label><br>
+            <textarea id="textareaInput"></textarea><br>
+            <button onclick="adicionarFormulario()">Adicionar Novo</button>
+        </div>
+
+        <!-- Área para gerar a tabela -->
+        <div class="table-container" id="tabelaContainer">
+            <h2>Tabela Gerada</h2>
+            <table id="tabelaOperacao">
+                <thead>
+                    <tr>
+                        <th><strong>Categoria</strong></th>
+                        <th><strong>Nome da Empresa</strong></th>
+                        <th><strong>Data</strong></th>
+                        <th><strong>Hora</strong></th>
+                        <th><strong>Origem</strong></th>
+                        <th><strong>Destino</strong></th>
+                        <th><strong>Local</strong></th>
+                        <th><strong>Motorista</strong></th>
+                        <th><strong>Telefone</strong></th>
+                        <th><strong>Placa do Cavalo</strong></th>
+                        <th><strong>Placa da Carreta</strong></th>
+                        <th><strong>Motivo</strong></th>
+                        <th><strong>Transportadora</strong></th>
+                        <th><strong>Agente 1</strong></th>
+                        <th><strong>Telefone Agente 1</strong></th>
+                        <th><strong>Veículo Agente 1</strong></th>
+                        <th><strong>Placa Agente 1</strong></th>
+                        <th><strong>Agente 2</strong></th>
+                        <th><strong>Telefone Agente 2</strong></th>
+                        <th><strong>Veículo Agente 2</strong></th>
+                        <th><strong>Placa Agente 2</strong></th>
+                        <th><strong>Agente 3</strong></th>
+                        <th><strong>Telefone Agente 3</strong></th>
+                        <th><strong>Veículo Agente 3</strong></th>
+                        <th><strong>Placa Agente 3</strong></th>
+                        <th><strong>Valor do Pedágio</strong></th>
+                        <th><strong>Km Inicial</strong></th>
+                        <th><strong>Km Final</strong></th>
+                        <th><strong>Total de Km</strong></th>
+                        <th><strong>Horário Local do Agente</strong></th>
+                        <th><strong>Horário de Início da Operação</strong></th>
+                        <th><strong>Horário de Término da Operação</strong></th>
+                        <th><strong>Total de Horas da Operação</strong></th>
+                        <th><strong>Total de Horas do Agente</strong></th>
+                        <th><strong>Manifesto</strong></th>
+                    </tr>
+                </thead>
+                <tbody id="corpoTabela">
+                </tbody>
+            </table>
+            <div class="table-actions">
+                <button onclick="copiarTabela()">Copiar Dados</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function copiarTabela() {
+            // Cria um elemento de texto temporário
+            const tempTextArea = document.createElement('textarea');
+            
+            // Pega os dados da tabela e coloca no texto do elemento temporário
+            const tabela = document.getElementById('tabelaOperacao');
+            let tabelaTexto = '';
+            
+            // Loop através das linhas da tabela, começando da segunda linha (ignorando os títulos)
+            for (let i = 1; i < tabela.rows.length; i++) { // Começa em 1 para ignorar a primeira linha (títulos)
+                let rowTexto = '';
+                for (let cell of tabela.rows[i].cells) {
+                    rowTexto += cell.textContent.trim() + '\t'; // Adiciona tabulação entre células
+                }
+                tabelaTexto += rowTexto.trim() + '\n'; // Adiciona quebra de linha entre linhas
+            }
+            
+            // Coloca o texto na área de transferência temporária
+            tempTextArea.value = tabelaTexto;
+            document.body.appendChild(tempTextArea);
+            
+            // Seleciona o conteúdo e executa o comando de cópia
+            tempTextArea.select();
+            document.execCommand('copy');
+            
+            // Remove o campo temporário
+            document.body.removeChild(tempTextArea);
+            
+            // Alerta de sucesso
+            alert("Dados copiados para a área de transferência!");
+        }
+        
+        function adicionarFormulario() {
+            const textoInput = document.getElementById('textareaInput').value;
+            const linhas = textoInput.split('\n');
+            const dados = {};
+
+            // Atribuir os dados ao objeto de forma estruturada
+            dados.categoria = removerAsteriscos(linhas[0]?.split(':')[1]?.trim() || '');
+            dados.nomeEmpresa = removerAsteriscos(linhas[1]?.split(':')[1]?.trim() || '');
+            dados.data = removerAsteriscos(linhas[2]?.split(':')[1]?.trim() || '');
+            dados.hora = removerAsteriscos(linhas[3]?.split(':')[1]?.trim() || '');
+            dados.origem = removerAsteriscos(linhas[4]?.split(':')[1]?.trim() || '');
+            dados.destino = removerAsteriscos(linhas[5]?.split(':')[1]?.trim() || '');
+            dados.local = removerAsteriscos(linhas[6]?.split(':')[1]?.trim() || '');
+            dados.motorista = removerAsteriscos(linhas[7]?.split(':')[1]?.trim() || '');
+            dados.telefone = removerAsteriscos(linhas[8]?.split(':')[1]?.trim() || '');
+            dados.placaCavalo = removerAsteriscos(linhas[9]?.split(':')[1]?.trim() || '');
+            dados.placaCarreta = removerAsteriscos(linhas[10]?.split(':')[1]?.trim() || '');
+            dados.motivo = removerAsteriscos(linhas[11]?.split(':')[1]?.trim() || '');
+            dados.transportadora = removerAsteriscos(linhas[12]?.split(':')[1]?.trim() || '');
+            dados.agente1 = removerAsteriscos(linhas[13]?.split(':')[1]?.trim() || '');
+            dados.telefoneAgente1 = removerAsteriscos(linhas[14]?.split(':')[1]?.trim() || '');
+            dados.veiculoAgente1 = removerAsteriscos(linhas[15]?.split(':')[1]?.trim() || '');
+            dados.placaAgente1 = removerAsteriscos(linhas[16]?.split(':')[1]?.trim() || '');
+            dados.agente2 = removerAsteriscos(linhas[17]?.split(':')[1]?.trim() || '');
+            dados.telefoneAgente2 = removerAsteriscos(linhas[18]?.split(':')[1]?.trim() || '');
+            dados.veiculoAgente2 = removerAsteriscos(linhas[19]?.split(':')[1]?.trim() || '');
+            dados.placaAgente2 = removerAsteriscos(linhas[20]?.split(':')[1]?.trim() || '');
+            dados.agente3 = removerAsteriscos(linhas[21]?.split(':')[1]?.trim() || '');
+            dados.telefoneAgente3 = removerAsteriscos(linhas[22]?.split(':')[1]?.trim() || '');
+            dados.veiculoAgente3 = removerAsteriscos(linhas[23]?.split(':')[1]?.trim() || '');
+            dados.placaAgente3 = removerAsteriscos(linhas[24]?.split(':')[1]?.trim() || '');
+            dados.valorPedagio = removerAsteriscos(linhas[25]?.split(':')[1]?.trim() || '');
+            dados.kmInicial = removerAsteriscos(linhas[26]?.split(':')[1]?.trim() || '');
+            dados.kmFinal = removerAsteriscos(linhas[27]?.split(':')[1]?.trim() || '');
+            dados.totalKm = removerAsteriscos(linhas[28]?.split(':')[1]?.trim() || '');
+            dados.horarioLocalAgente = removerAsteriscos(linhas[29]?.split(':')[1]?.trim() || '');
+            dados.horarioInicioOperacao = removerAsteriscos(linhas[30]?.split(':')[1]?.trim() || '');
+            dados.horarioTerminoOperacao = removerAsteriscos(linhas[31]?.split(':')[1]?.trim() || '');
+            dados.totalHorasOperacao = removerAsteriscos(linhas[32]?.split(':')[1]?.trim() || '');
+            dados.totalHorasAgente = removerAsteriscos(linhas[33]?.split(':')[1]?.trim() || '');
+            dados.manifesto = removerAsteriscos(linhas[34]?.split(':')[1]?.trim() || '');
+
+            // Adicionar os dados ao corpo da tabela
+            const corpoTabela = document.getElementById('corpoTabela');
+            const novaLinha = document.createElement('tr');
+
+            Object.values(dados).forEach(valor => {
+                const td = document.createElement('td');
+                td.textContent = valor;
+                novaLinha.appendChild(td);
+            });
+
+            corpoTabela.appendChild(novaLinha);
+
+            // Exibe a tabela e limpa o campo de input
+            document.getElementById('tabelaContainer').style.display = 'block';
+            document.getElementById('textareaInput').value = ''; // Limpa o campo de texto
+        }
+
+        // Função para remover asteriscos de texto
+        function removerAsteriscos(texto) {
+            return texto.replace(/\*/g, ''); // Remove todos os asteriscos
+        }
+    </script>
+</body>
+</html>
