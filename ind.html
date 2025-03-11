@@ -12,8 +12,9 @@
             padding: 0;
         }
         .container {
-            width: 80%;
+            width: 90%;
             margin: 50px auto;
+            padding: 0 15px;
         }
         h1 {
             text-align: center;
@@ -67,6 +68,7 @@
         th, td {
             padding: 10px;
             text-align: left;
+            white-space: nowrap; /* Prevent text from wrapping */
         }
         th {
             background-color: #f2f2f2;
@@ -81,6 +83,33 @@
         }
         .table-actions button:hover {
             background-color: #0056b3;
+        }
+
+        /* Responsividade */
+        @media screen and (max-width: 768px) {
+            table, th, td {
+                font-size: 12px;
+                padding: 8px;
+            }
+            th, td {
+                display: block;
+                width: 100%;
+                box-sizing: border-box;
+                text-align: right;
+            }
+            td {
+                text-align: left;
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+            th {
+                background-color: #f9f9f9;
+            }
+            .table-actions {
+                flex-direction: column;
+                align-items: center;
+                margin-top: 10px;
+            }
         }
     </style>
 </head>
