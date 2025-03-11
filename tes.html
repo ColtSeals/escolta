@@ -162,7 +162,7 @@
     </div>
 
     <script>
-        function copiarTabela() {
+    function copiarTabela() {
     // Cria um elemento de texto temporário
     const tempTextArea = document.createElement('textarea');
     
@@ -170,11 +170,11 @@
     const tabela = document.getElementById('tabelaOperacao');
     let tabelaTexto = '';
     
-    // Loop através das linhas da tabela e montar um texto com o conteúdo
-    for (let row of tabela.rows) {
+    // Loop através das linhas da tabela, começando da segunda linha (ignorando os títulos)
+    for (let i = 1; i < tabela.rows.length; i++) { // Começa em 1 para ignorar a primeira linha (títulos)
         let rowTexto = '';
-        for (let cell of row.cells) {
-            rowTexto += cell.textContent + '\t'; // Adiciona tabulação entre células
+        for (let cell of tabela.rows[i].cells) {
+            rowTexto += cell.textContent.trim() + '\t'; // Adiciona tabulação entre células
         }
         tabelaTexto += rowTexto.trim() + '\n'; // Adiciona quebra de linha entre linhas
     }
@@ -193,6 +193,7 @@
     // Alerta de sucesso
     alert("Dados copiados para a área de transferência!");
 }
+
 
         
         function adicionarFormulario() {
