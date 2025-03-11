@@ -1,191 +1,227 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerador de Tabela de Escolta/Preservação</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Formulário de Operação</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7fa;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 90%;
+            margin: 50px auto;
+            padding: 0 15px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .form-container {
+            margin-bottom: 20px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
         .table-container {
-            max-height: 500px;
-            overflow-y: auto;
+            margin-top: 30px;
+            display: none;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow-x: auto; /* Habilita rolagem horizontal */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            white-space: nowrap; /* Evita que o texto se quebre em várias linhas */
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .table-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        .table-actions button {
+            background-color: #007BFF;
+        }
+        .table-actions button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Responsividade - Adicionando rolagem horizontal */
+        @media screen and (max-width: 768px) {
+            .table-container {
+                overflow-x: auto; /* Adiciona rolagem horizontal */
+            }
+            table {
+                min-width: 1200px; /* Impede que a tabela fique muito compacta */
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <h2 class="mb-4">Gerador de Tabela de Escolta/Preservação</h2>
-        
-        <div class="row">
-            <div class="col-md-6">
-                <div class="mb-3">
-                    <label for="inputText" class="form-label">Cole o texto aqui:</label>
-                    <textarea class="form-control" id="inputText" rows="10" placeholder="Cole o texto aqui..."></textarea>
-                </div>
-                <button class="btn btn-primary mb-3" onclick="generateTable()">Gerar Tabela</button>
-            </div>
-            <div class="col-md-6">
-                <div class="table-container">
-                    <table class="table table-striped table-bordered" id="outputTable">
-                        <thead>
-                            <tr>
-                                <th>MODALIDADE</th>
-                                <th>EMPRESA</th>
-                                <th>ORIGEM</th>
-                                <th>DESTINO</th>
-                                <th>DATA</th>
-                                <th>HORARIO</th>
-                                <th>MOTORISTA</th>
-                                <th>PLACA</th>
-                                <th>TELEFONE</th>
-                                <th>AGENTE 1</th>
-                                <th>TEL AGENTE 1</th>
-                                <th>AGENTE 2</th>
-                                <th>TEL AGENTE 2</th>
-                                <th>VEÍCULO</th>
-                                <th>PLACA VEÍCULO</th>
-                                <th>VALOR PEDÁGIO</th>
-                                <th>KM INICIAL</th>
-                                <th>KM FINAL</th>
-                                <th>TOTAL KM</th>
-                                <th>HORÁRIO LOCAL</th>
-                                <th>HORÁRIO INÍCIO</th>
-                                <th>HORÁRIO TÉRMINO</th>
-                                <th>TOTAL HORAS OP</th>
-                                <th>TOTAL HORAS AGENTE</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-                <button class="btn btn-success mt-3" onclick="copyToClipboard()">Copiar para Excel</button>
+    <div class="container">
+        <h1>Formulário de Operação</h1>
+
+        <!-- Formulário de entrada de dados -->
+        <div class="form-container">
+            <label for="textareaInput">Cole os dados aqui:</label><br>
+            <textarea id="textareaInput"></textarea><br>
+            <button onclick="adicionarFormulario()">Adicionar Novo</button>
+        </div>
+
+        <!-- Área para gerar a tabela -->
+        <div class="table-container" id="tabelaContainer">
+            <h2>Tabela Gerada</h2>
+            <table id="tabelaOperacao">
+                <thead>
+                    <tr>
+                        <th><strong>Categoria</strong></th>
+                        <th><strong>Nome da Empresa</strong></th>
+                        <th><strong>Data</strong></th>
+                        <th><strong>Hora</strong></th>
+                        <th><strong>Origem</strong></th>
+                        <th><strong>Destino</strong></th>
+                        <th><strong>Local</strong></th>
+                        <th><strong>Motorista</strong></th>
+                        <th><strong>Telefone</strong></th>
+                        <th><strong>Placa do Cavalo</strong></th>
+                        <th><strong>Placa da Carreta</strong></th>
+                        <th><strong>Motivo</strong></th>
+                        <th><strong>Transportadora</strong></th>
+                        <th><strong>Agente 1</strong></th>
+                        <th><strong>Telefone Agente 1</strong></th>
+                        <th><strong>Veículo Agente 1</strong></th>
+                        <th><strong>Placa Agente 1</strong></th>
+                        <th><strong>Agente 2</strong></th>
+                        <th><strong>Telefone Agente 2</strong></th>
+                        <th><strong>Veículo Agente 2</strong></th>
+                        <th><strong>Placa Agente 2</strong></th>
+                        <th><strong>Agente 3</strong></th>
+                        <th><strong>Telefone Agente 3</strong></th>
+                        <th><strong>Veículo Agente 3</strong></th>
+                        <th><strong>Placa Agente 3</strong></th>
+                        <th><strong>Valor do Pedágio</strong></th>
+                        <th><strong>Km Inicial</strong></th>
+                        <th><strong>Km Final</strong></th>
+                        <th><strong>Total de Km</strong></th>
+                        <th><strong>Horário Local do Agente</strong></th>
+                        <th><strong>Horário de Início da Operação</strong></th>
+                        <th><strong>Horário de Término da Operação</strong></th>
+                        <th><strong>Total de Horas da Operação</strong></th>
+                        <th><strong>Total de Horas do Agente</strong></th>
+                        <th><strong>Manifesto</strong></th>
+                    </tr>
+                </thead>
+                <tbody id="corpoTabela">
+                </tbody>
+            </table>
+            <div class="table-actions">
+                <button onclick="gerarExcel()">Gerar Excel</button>
+                <button onclick="copiarTabela()">Copiar Dados</button>
             </div>
         </div>
     </div>
 
     <script>
-        function generateTable() {
-            const input = document.getElementById('inputText').value;
-            const lines = input.split('\n');
-            const tbody = document.querySelector('#outputTable tbody');
-            tbody.innerHTML = '';
+        function adicionarFormulario() {
+            const textoInput = document.getElementById('textareaInput').value;
+            const linhas = textoInput.split('\n');
+            const dados = {};
 
-            let currentData = {};
-            let entries = [];
+            // Atribuir os dados ao objeto de forma estruturada
+            dados.categoria = removerAsteriscos(linhas[0]?.split(':')[1]?.trim() || '');
+            dados.nomeEmpresa = removerAsteriscos(linhas[1]?.split(':')[1]?.trim() || '');
+            dados.data = removerAsteriscos(linhas[2]?.split(':')[1]?.trim() || '');
+            dados.hora = removerAsteriscos(linhas[3]?.split(':')[1]?.trim() || '');
+            dados.origem = removerAsteriscos(linhas[4]?.split(':')[1]?.trim() || '');
+            dados.destino = removerAsteriscos(linhas[5]?.split(':')[1]?.trim() || '');
+            dados.local = removerAsteriscos(linhas[6]?.split(':')[1]?.trim() || '');
+            dados.motorista = removerAsteriscos(linhas[7]?.split(':')[1]?.trim() || '');
+            dados.telefone = removerAsteriscos(linhas[8]?.split(':')[1]?.trim() || '');
+            dados.placaCavalo = removerAsteriscos(linhas[9]?.split(':')[1]?.trim() || '');
+            dados.placaCarreta = removerAsteriscos(linhas[10]?.split(':')[1]?.trim() || '');
+            dados.motivo = removerAsteriscos(linhas[11]?.split(':')[1]?.trim() || '');
+            dados.transportadora = removerAsteriscos(linhas[12]?.split(':')[1]?.trim() || '');
+            dados.agente1 = removerAsteriscos(linhas[13]?.split(':')[1]?.trim() || '');
+            dados.telefoneAgente1 = removerAsteriscos(linhas[14]?.split(':')[1]?.trim() || '');
+            dados.veiculoAgente1 = removerAsteriscos(linhas[15]?.split(':')[1]?.trim() || '');
+            dados.placaAgente1 = removerAsteriscos(linhas[16]?.split(':')[1]?.trim() || '');
+            dados.agente2 = removerAsteriscos(linhas[17]?.split(':')[1]?.trim() || '');
+            dados.telefoneAgente2 = removerAsteriscos(linhas[18]?.split(':')[1]?.trim() || '');
+            dados.veiculoAgente2 = removerAsteriscos(linhas[19]?.split(':')[1]?.trim() || '');
+            dados.placaAgente2 = removerAsteriscos(linhas[20]?.split(':')[1]?.trim() || '');
+            dados.agente3 = removerAsteriscos(linhas[21]?.split(':')[1]?.trim() || '');
+            dados.telefoneAgente3 = removerAsteriscos(linhas[22]?.split(':')[1]?.trim() || '');
+            dados.veiculoAgente3 = removerAsteriscos(linhas[23]?.split(':')[1]?.trim() || '');
+            dados.placaAgente3 = removerAsteriscos(linhas[24]?.split(':')[1]?.trim() || '');
+            dados.valorPedagio = removerAsteriscos(linhas[25]?.split(':')[1]?.trim() || '');
+            dados.kmInicial = removerAsteriscos(linhas[26]?.split(':')[1]?.trim() || '');
+            dados.kmFinal = removerAsteriscos(linhas[27]?.split(':')[1]?.trim() || '');
+            dados.totalKm = removerAsteriscos(linhas[28]?.split(':')[1]?.trim() || '');
+            dados.horarioLocalAgente = removerAsteriscos(linhas[29]?.split(':')[1]?.trim() || '');
+            dados.horarioInicioOperacao = removerAsteriscos(linhas[30]?.split(':')[1]?.trim() || '');
+            dados.horarioTerminoOperacao = removerAsteriscos(linhas[31]?.split(':')[1]?.trim() || '');
+            dados.totalHorasOperacao = removerAsteriscos(linhas[32]?.split(':')[1]?.trim() || '');
+            dados.totalHorasAgente = removerAsteriscos(linhas[33]?.split(':')[1]?.trim() || '');
+            dados.manifesto = removerAsteriscos(linhas[34]?.split(':')[1]?.trim() || '');
 
-            lines.forEach(line => {
-                line = line.trim();
-                if (!line) {
-                    if (Object.keys(currentData).length > 0) {
-                        entries.push({...currentData});
-                        currentData = {};
-                    }
-                    return;
-                }
+            // Adicionar os dados ao corpo da tabela
+            const corpoTabela = document.getElementById('corpoTabela');
+            const novaLinha = document.createElement('tr');
 
-                if (line === 'ESCOLTA' || line === 'PRESERVAÇÃO') {
-                    currentData.modalidade = line;
-                } else if (!currentData.empresa && currentData.modalidade && 
-                    !line.startsWith('Origem:') && !line.startsWith('PRESERVAÇÃO')) {
-                    currentData.empresa = line;
-                } else if (line.startsWith('Origem:')) {
-                    currentData.origem = line.replace('Origem: ', '');
-                } else if (line.startsWith('Destino:')) {
-                    currentData.destino = line.replace('Destino: ', '');
-                } else if (line.startsWith('Data:')) {
-                    currentData.data = line.replace('Data: ', '');
-                } else if (line.startsWith('Hora:')) {
-                    currentData.horario = line.replace('Hora: ', '');
-                } else if (line.startsWith('Motorista:')) {
-                    currentData.motorista = line.replace('Motorista: ', '');
-                } else if (line.startsWith('Placa:') && !currentData.placa) {
-                    currentData.placa = line.replace('Placa: ', '');
-                } else if (line.startsWith('Telefone:') && !currentData.telefone) {
-                    currentData.telefone = line.replace('Telefone: ', '');
-                } else if (line.startsWith('Agente:') || line.startsWith('Agente 1:')) {
-                    const agentes = line.replace(/Agente( 1)?: /, '').split(' e ');
-                    currentData.agente1 = agentes[0];
-                    currentData.agente2 = agentes[1] || '';
-                } else if (line.startsWith('Telefones do agente:') || line.startsWith('Telefones do agente 1:')) {
-                    currentData.telAgente1 = line.replace(/Telefones do agente( 1)?: /, '');
-                } else if (line.startsWith('Telefones do agente 2:')) {
-                    currentData.telAgente2 = line.replace('Telefones do agente 2: ', '');
-                } else if (line.startsWith('Veículo utilizado:')) {
-                    currentData.veiculo = line.replace('Veículo utilizado: ', '');
-                } else if (line.startsWith('Placa:') && currentData.placa) {
-                    currentData.placaVeiculo = line.replace('Placa: ', '');
-                } else if (line.startsWith('Valor do pedágio:')) {
-                    currentData.pedagio = line.replace('Valor do pedágio: ', '');
-                } else if (line.startsWith('Km inicial:')) {
-                    currentData.kmInicial = parseInt(line.replace('Km inicial: ', '')) || 0;
-                } else if (line.startsWith('Km final:')) {
-                    currentData.kmFinal = parseInt(line.replace('Km final: ', '')) || 0;
-                } else if (line.startsWith('Horário local do agente:')) {
-                    currentData.horarioLocal = line.replace('Horário local do agente: ', '');
-                } else if (line.startsWith('Horário de início da operação:')) {
-                    currentData.horarioInicio = line.replace('Horário de início da operação: ', '');
-                } else if (line.startsWith('Horário de término da operação:')) {
-                    currentData.horarioTermino = line.replace('Horário de término da operação: ', '');
-                } else if (line.startsWith('Total de horas da operação:')) {
-                    currentData.totalHorasOp = line.replace('Total de horas da operação: ', '');
-                } else if (line.startsWith('Total de horas do agente:')) {
-                    currentData.totalHorasAgente = line.replace('Total de horas do agente: ', '');
-                }
+            Object.values(dados).forEach(valor => {
+                const td = document.createElement('td');
+                td.textContent = valor;
+                novaLinha.appendChild(td);
             });
 
-            if (Object.keys(currentData).length > 0) {
-                entries.push(currentData);
-            }
-
-            entries.forEach(entry => {
-                const totalKm = entry.kmFinal && entry.kmInicial ? entry.kmFinal - entry.kmInicial : '';
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${entry.modalidade || ''}</td>
-                    <td>${entry.empresa || ''}</td>
-                    <td>${entry.origem || ''}</td>
-                    <td>${entry.destino || ''}</td>
-                    <td>${entry.data || ''}</td>
-                    <td>${entry.horario || ''}</td>
-                    <td>${entry.motorista || ''}</td>
-                    <td>${entry.placa || ''}</td>
-                    <td>${entry.telefone || ''}</td>
-                    <td>${entry.agente1 || ''}</td>
-                    <td>${entry.telAgente1 || ''}</td>
-                    <td>${entry.agente2 || ''}</td>
-                    <td>${entry.telAgente2 || ''}</td>
-                    <td>${entry.veiculo || ''}</td>
-                    <td>${entry.placaVeiculo || ''}</td>
-                    <td>${entry.pedagio || ''}</td>
-                    <td>${entry.kmInicial || ''}</td>
-                    <td>${entry.kmFinal || ''}</td>
-                    <td>${totalKm}</td>
-                    <td>${entry.horarioLocal || ''}</td>
-                    <td>${entry.horarioInicio || ''}</td>
-                    <td>${entry.horarioTermino || ''}</td>
-                    <td>${entry.totalHorasOp || ''}</td>
-                    <td>${entry.totalHorasAgente || ''}</td>
-                `;
-                tbody.appendChild(row);
-            });
+            corpoTabela.appendChild(novaLinha);
+            document.getElementById('tabelaContainer').style.display = 'block';
         }
 
-        function copyToClipboard() {
-            const table = document.getElementById('outputTable');
-            let tsv = '';
-            for (let row of table.rows) {
-                let rowData = [];
-                for (let cell of row.cells) {
-                    rowData.push(cell.innerText);
-                }
-                tsv += rowData.join('\t') + '\n';
-            }
-            navigator.clipboard.writeText(tsv)
-                .then(() => alert('Dados copiados para a área de transferência! Cole no Excel usando Ctrl+V'))
-                .catch(err => alert('Erro ao copiar: ' + err));
+        // Função para remover asteriscos de texto
+        function removerAsteriscos(texto) {
+            return texto.replace(/\*/g, ''); // Remove todos os asteriscos
         }
     </script>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
