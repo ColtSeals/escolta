@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Gerador de Tabela de Operação</title>
+    <style>
+        .container { max-width: 800px; margin: 20px auto; }
+        .input-group { margin-bottom: 20px; }
+        textarea { width: 100%; height: 300px; margin-bottom: 10px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        button { margin-right: 10px; padding: 5px 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="inputs">
+            <div class="input-group">
+                <textarea placeholder="Cole o texto aqui..."></textarea>
+            </div>
+        </div>
+        <button onclick="addInput()">+</button>
+        <button onclick="generateTable()">Gerar Excel</button>
+        <button onclick="copyTableData()">Copiar Dados</button>
+        
+        <div id="tableContainer"></div>
+    </div>
+
+    <script>
+        function addInput() {
+            const inputGroup = document.createElement('div');
+            inputGroup.className = 'input-group';
+            inputGroup.innerHTML = '<textarea placeholder="Cole o texto aqui..."></textarea>';
+            document.getElementById('inputs').appendChild(inputGroup);
+        }
+
+        function parseText(text) {
+            const lines = text.split('\n');
+            const data = {};
+            
+            lines.forEach(line => {
+                const [key, value] = line.split(':').map(item => item.trim());
+                if (key && value !== undefined) {
+                    data[key] = value;
+                }
+            });
+            
+            return [
+                data['Nome da Empresa'] || '',
+                data['Data'] || '',
+                data['Hora'] || '',
+                data['Origem'] || '',
+                data['Destino'] || '',
+                data['Local'] || '',
+                data['Motorista'] || '',
+                data['Telefone'] || '',
+                data['Placa do Cavalo'] || '',
+                data['Placa da Carreta'] || '',
+                data['Motivo'] || '',
+                data['Transportadora'] || '',
+                data['Agente 1'] || '',
+                data['Telefone do Agente 1'] || '',
+                data['Veículo Utilizado'] || '',
+                data['Placa'] || '',
+                data['Agente 2'] || '',
+                data['Telefone do Agente 2'] || '',
+                data['Veículo Utilizado'] || '',
+                data['Placa'] || '',
+                data['Agente 3'] || '',
+                data['Telefone do Agente 3'] || '',
+                data['Veículo Utilizado'] || '',
+                data['Placa'] || '',
+                data['Valor do Pedágio'] || '',
+                data['Km Inicial'] || '',
+                data['Km Final'] || '',
+                data['Total de Km'] || '',
+                data['Horário Local do Agente'] || '',
+                data['Horário de Início da Operação'] || '',
+                data['Horário de Término da Operação'] || '',
+                data['Total de Horas da Operação'] || '',
+                data['Total de Horas do Agente'] || '',
+                data['Manifesto'] || ''
+            ];
+        }
+
+        function generateTable() {
+            const textareas = document.querySelectorAll('textarea');
+            const headers = [
+                'Nome da Empresa', 'Data', 'Hora', 'Origem', 'Destino', 'Local',
+                'Motorista', 'Telefone', 'Placa do Cavalo', 'Placa da Carreta', 'Motivo', 'Transportadora',
+                'Agente 1', 'Telefone do Agente 1', 'Veículo Utilizado', 'Placa',
+                'Agente 2', 'Telefone do Agente 2', 'Veículo Utilizado', 'Placa',
+                'Agente 3', 'Telefone do Agente 3', 'Veículo Utilizado', 'Placa',
+                'Valor do Pedágio', 'Km Inicial', 'Km Final', 'Total de Km',
+                'Horário Local do Agente', 'Horário de Início da Operação',
+                'Horário de Término da Operação', 'Total de Horas da Operação',
+                'Total de Horas do Agente', 'Manifesto'
+            ];
+            
+            let tableHTML = '<table><thead><tr>';
+            headers.forEach(header => {
+                tableHTML += `<th>${header}</th>`;
+            });
+            tableHTML += '</tr></thead><tbody>';
+
+            textareas.forEach(textarea => {
+                if (textarea.value.trim()) {
+                    const rowData = parseText(textarea.value);
+                    tableHTML += '<tr>';
+                    rowData.forEach(cell => {
+                        tableHTML += `<td>${cell}</td>`;
+                    });
+                    tableHTML += '</tr>';
+                }
+            });
+
+            tableHTML += '</tbody></table>';
+            document.getElementById('tableContainer').innerHTML = tableHTML;
+        }
+
+        function copyTableData() {
+            const rows = document.querySelectorAll('tbody tr');
+            let copyText = '';
+            
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const rowData = Array.from(cells).map(cell => cell.textContent);
+                copyText += rowData.join('\t') + '\n';
+            });
+
+            navigator.clipboard.writeText(copyText.trim())
+                .then(() => alert('Dados copiados para a área de transferência!'))
+                .catch(err => alert('Erro ao copiar: ' + err));
+        }
+    </script>
+</body>
+</html>
