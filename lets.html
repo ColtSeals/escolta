@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador de Operações</title>
+    <script>
+        function adicionarNaTabela() {
+            let textarea = document.getElementById("dados");
+            let texto = textarea.value;
+
+            // Objeto para armazenar os dados extraídos
+            let dados = {
+                "Categoria": "",
+                "Nome da Empresa": "",
+                "Data": "",
+                "Hora": "",
+                "Origem": "",
+                "Destino": "",
+                "Local": "",
+                "Motorista": "",
+                "Telefone Motorista": "",
+                "Placa do Cavalo": "",
+                "Placa da Carreta": "",
+                "Motivo": "",
+                "Transportadora": "",
+                "Agente 1": "",
+                "Telefone Agente 1": "",
+                "Veículo Agente 1": "",
+                "Placa Agente 1": "",
+                "Agente 2": "",
+                "Telefone Agente 2": "",
+                "Veículo Agente 2": "",
+                "Placa Agente 2": "",
+                "Agente 3": "",
+                "Telefone Agente 3": "",
+                "Veículo Agente 3": "",
+                "Placa Agente 3": "",
+                "Agente 4": "",
+                "Telefone Agente 4": "",
+                "Veículo Agente 4": "",
+                "Placa Agente 4": "",
+                "Valor do Pedágio": "",
+                "Km Inicial": "",
+                "Km Final": "",
+                "Total de Km": "",
+                "Horário Local do Agente": "",
+                "Horário de Início": "",
+                "Horário de Término": "",
+                "Total de Horas da Operação": "",
+                "Total de Horas do Agente": "",
+                "Manifesto": ""
+            };
+
+            // Expressões regulares para capturar os valores baseados no nome do campo
+            let regexMap = {
+                "Categoria": /\*Categoria\*:\s*([^\n]+)/i,
+                "Nome da Empresa": /\*Nome da Empresa\*:\s*([^\n]+)/i,
+                "Data": /\*Data\*:\s*([^\n]+)/i,
+                "Hora": /\*Hora\*:\s*([^\n]+)/i,
+                "Origem": /\*Origem\*:\s*([^\n]+)/i,
+                "Destino": /\*Destino\*:\s*([^\n]+)/i,
+                "Local": /\*Local\*:\s*([^\n]+)/i,
+                "Motorista": /\*Motorista\*:\s*([^\n]+)/i,
+                "Telefone Motorista": /\*Telefone\*:\s*([^\n]+)/i,
+                "Placa do Cavalo": /\*Placa do Cavalo\*:\s*([^\n]+)/i,
+                "Placa da Carreta": /\*Placa da Carreta\*:\s*([^\n]+)/i,
+                "Motivo": /\*Motivo\*:\s*([^\n]+)/i,
+                "Transportadora": /\*Transportadora\*:\s*([^\n]+)/i,
+                "Agente 1": /\*Agente 1\*:\s*([^\n]+)/i,
+                "Telefone Agente 1": /\*Telefone do Agente 1\*:\s*([^\n]+)/i,
+                "Veículo Agente 1": /\*Veículo Utilizado\*:\s*([^\n]+)/i,
+                "Placa Agente 1": /\*Placa\*:\s*([^\n]+)/i,
+                "Agente 2": /\*Agente 2\*:\s*([^\n]+)/i,
+                "Telefone Agente 2": /\*Telefone do Agente 2\*:\s*([^\n]+)/i,
+                "Veículo Agente 2": /\*Veículo Utilizado\*:\s*([^\n]+)/i,
+                "Placa Agente 2": /\*Placa\*:\s*([^\n]+)/i,
+                "Agente 3": /\*Agente 3\*:\s*([^\n]+)/i,
+                "Telefone Agente 3": /\*Telefone do Agente 3\*:\s*([^\n]+)/i,
+                "Veículo Agente 3": /\*Veículo Utilizado\*:\s*([^\n]+)/i,
+                "Placa Agente 3": /\*Placa\*:\s*([^\n]+)/i,
+                "Agente 4": /\*Agente 4\*:\s*([^\n]+)/i,
+                "Telefone Agente 4": /\*Telefone do Agente 4\*:\s*([^\n]+)/i,
+                "Veículo Agente 4": /\*Veículo Utilizado\*:\s*([^\n]+)/i,
+                "Placa Agente 4": /\*Placa\*:\s*([^\n]+)/i,
+                "Valor do Pedágio": /\*Valor do Pedágio\*:\s*([^\n]+)/i,
+                "Km Inicial": /\*Km Inicial\*:\s*([^\n]+)/i,
+                "Km Final": /\*Km Final\*:\s*([^\n]+)/i,
+                "Total de Km": /\*Total de Km\*:\s*([^\n]+)/i,
+                "Horário Local do Agente": /\*Horário Local do Agente\*:\s*([^\n]+)/i,
+                "Horário de Início": /\*Horário de Início\*:\s*([^\n]+)/i,
+                "Horário de Término": /\*Horário de Término\*:\s*([^\n]+)/i,
+                "Total de Horas da Operação": /\*Total de Horas da Operação\*:\s*([^\n]+)/i,
+                "Total de Horas do Agente": /\*Total de Horas do Agente\*:\s*([^\n]+)/i,
+                "Manifesto": /\*Manifesto\*:\s*([^\n]+)/i
+            };
+
+            // Preencher os dados encontrados
+            for (let campo in regexMap) {
+                let match = texto.match(regexMap[campo]);
+                if (match) {
+                    dados[campo] = match[1].trim();
+                }
+            }
+
+            // Criar uma nova linha na tabela
+            let tabela = document.getElementById("tabela");
+            let linha = tabela.insertRow();
+
+            Object.values(dados).forEach(valor => {
+                let celula = linha.insertCell();
+                celula.textContent = valor;
+            });
+
+            // Limpar o textarea
+            textarea.value = "";
+        }
+
+        function copiarParaExcel() {
+            let tabela = document.getElementById("tabela");
+            let texto = "";
+
+            for (let i = 1; i < tabela.rows.length; i++) {
+                let linha = tabela.rows[i];
+                let valores = [];
+
+                for (let j = 0; j < linha.cells.length; j++) {
+                    valores.push(linha.cells[j].textContent);
+                }
+
+                texto += valores.join("\t") + "\n";
+            }
+
+            navigator.clipboard.writeText(texto).then(() => {
+                alert("Copiado para a área de transferência! Cole no Excel.");
+            }).catch(err => {
+                alert("Erro ao copiar: " + err);
+            });
+        }
+    </script>
+</head>
+<body>
+    <h2>Gerenciador de Operações</h2>
+    
+    <textarea id="dados" rows="10" cols="50" placeholder="Cole os dados aqui..."></textarea><br>
+    <button onclick="adicionarNaTabela()">Adicionar</button>
+    <button onclick="copiarParaExcel()">Copiar para Excel</button>
+
+    <h3>Tabela de Registros</h3>
+    <table id="tabela" border="1">
+        <thead></thead>
+        <tbody></tbody>
+    </table>
+</body>
+</html>
