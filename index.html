@@ -48,7 +48,7 @@
             document.getElementById('inputData').value = ""; // Limpa o textarea
             const linhas = inputText.split('\n');
             const dados = {};
-            const regex = /^(.*?):\s*(.*)$/;
+            const regex = /^\*?(.*?)\*?:\s*(.*)$/;
 
             linhas.forEach(linha => {
                 const match = linha.match(regex);
