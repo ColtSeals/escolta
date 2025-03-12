@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Tabela</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            overflow-x: auto;
+            display: block;
+            white-space: nowrap;
+        }
+        th, td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+        }
+        .table-container {
+            overflow-x: auto;
+            max-width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h2>Gerador de Tabela</h2>
+    <textarea id="inputData" placeholder="Cole os dados aqui..."></textarea>
+    <br>
+    <button onclick="gerarTabela()">Gerar Tabela</button>
+    <button onclick="copiarTabela()">Copiar Tabela</button>
+    <div class="table-container">
+        <table id="tabela">
+        </table>
+    </div>
+
+    <script>
+        function gerarTabela() {
+            const inputText = document.getElementById('inputData').value;
+            document.getElementById('inputData').value = ""; // Limpa o textarea
+            const linhas = inputText.split('\n');
+            const dados = {};
+            const regex = /^(.*?):\s*(.*)$/;
+
+            linhas.forEach(linha => {
+                const match = linha.match(regex);
+                if (match) {
+                    const chave = match[1].trim();
+                    const valor = match[2].trim();
+                    dados[chave] = valor;
+                }
+            });
+
+            const campos = [
+                "Data", "Hora", "Categoria", "Nome da Empresa", "Origem", "Destino", "Local",
+                "Motorista", "Telefone", "Placa do Cavalo", "Placa da Carreta", "Motivo", "Transportadora",
+                "Agente 1", "Telefone do Agente 1", "Veículo Utilizado 1", "Placa 1",
+                "Agente 2", "Telefone do Agente 2", "Veículo Utilizado 2", "Placa 2",
+                "Agente 3", "Telefone do Agente 3", "Veículo Utilizado 3", "Placa 3",
+                "Agente 4", "Telefone do Agente 4", "Veículo Utilizado 4", "Placa 4",
+                "Valor do Pedágio", "Km Inicial", "Km Final", "Total de Km",
+                "Horário Local do Agente", "Horário de Início da Operação", "Horário de Término da Operação",
+                "Total de Horas da Operação", "Total de Horas do Agente", "Manifesto"
+            ];
+
+            const tabela = document.getElementById('tabela');
+            if (tabela.rows.length === 0) {
+                let headerRow = '<tr>';
+                campos.forEach(campo => {
+                    headerRow += `<th>${campo}</th>`;
+                });
+                headerRow += '</tr>';
+                tabela.innerHTML = headerRow;
+            }
+
+            let dataRow = '<tr>';
+            campos.forEach(campo => {
+                dataRow += `<td>${dados[campo] || ''}</td>`;
+            });
+            dataRow += '</tr>';
+            tabela.innerHTML += dataRow;
+        }
+
+        function copiarTabela() {
+            const tabela = document.getElementById('tabela');
+            let texto = '';
+            for (let i = 1; i < tabela.rows.length; i++) {
+                for (let j = 0; j < tabela.rows[i].cells.length; j++) {
+                    texto += tabela.rows[i].cells[j].innerText + '\t';
+                }
+                texto += '\n';
+            }
+            navigator.clipboard.writeText(texto.trim()).then(() => {
+                alert('Tabela copiada com sucesso!');
+            });
+        }
+    </script>
+</body>
+</html>
