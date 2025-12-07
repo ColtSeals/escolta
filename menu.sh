@@ -196,26 +196,32 @@ gerenciar_usuarios() {
         barra
 
         idx=1
+        unset usuarios
         declare -a usuarios
 
-        while read -r line; do
-            [ -z "$line" ] && continue
-            usuario=$(echo "$line" | jq -r '.usuario' 2>/dev/null)
-            [ -z "$usuario" ] && continue
-            [ "$usuario" = "null" ] && continue
+        # Só tenta ler se o arquivo não estiver vazio
+        if [ -s "$DB_PMESP" ]; then
+            # Lê cada usuário como um JSON completo (mesmo que esteja em várias linhas no arquivo)
+            while IFS= read -r line; do
+                [ -z "$line" ] && continue
 
-            matricula=$(echo "$line" | jq -r '.matricula')
-            email=$(echo "$line" | jq -r '.email')
-            dias=$(echo "$line" | jq -r '.dias')
-            limite=$(echo "$line" | jq -r '.limite')
-            hwid=$(echo "$line" | jq -r '.hwid')
+                usuario=$(echo "$line" | jq -r '.usuario // empty' 2>/dev/null)
+                [ -z "$usuario" ] && continue
+                [ "$usuario" = "null" ] && continue
 
-            printf "%3s) %-15s | MAT: %-10s | DIAS: %-5s | LIM: %-3s | EMAIL: %-20s | HWID: %s\n" \
-                "$idx" "$usuario" "$matricula" "$dias" "$limite" "$email" "$hwid"
+                matricula=$(echo "$line" | jq -r '.matricula // "-"')
+                email=$(echo "$line" | jq -r '.email // "-"')
+                dias=$(echo "$line" | jq -r '.dias // "-"')
+                limite=$(echo "$line" | jq -r '.limite // "-"')
+                hwid=$(echo "$line" | jq -r '.hwid // "-"')
 
-            usuarios[$idx]="$usuario"
-            idx=$((idx + 1))
-        done < "$DB_PMESP"
+                printf "%3s) %-15s | MAT: %-10s | DIAS: %-5s | LIM: %-3s | EMAIL: %-20s | HWID: %s\n" \
+                    "$idx" "$usuario" "$matricula" "$dias" "$limite" "$email" "$hwid"
+
+                usuarios[$idx]="$usuario"
+                idx=$((idx + 1))
+            done < <(jq -c '.' "$DB_PMESP" 2>/dev/null)
+        fi
 
         if [ "$idx" -eq 1 ]; then
             echo "Nenhum usuário cadastrado."
@@ -247,7 +253,9 @@ gerenciar_usuarios() {
         case "$acao" in
             1)
                 userdel -f "$user_sel" >/dev/null 2>&1
-                grep -v "\"usuario\": \"$user_sel\"" "$DB_PMESP" > "${DB_PMESP}.tmp" && mv "${DB_PMESP}.tmp" "$DB_PMESP"
+                tmp=$(mktemp)
+                jq -c --arg u "$user_sel" 'select(.usuario != $u)' "$DB_PMESP" > "$tmp" && mv "$tmp" "$DB_PMESP"
+                chmod 666 "$DB_PMESP"
                 echo -e "${COR_VERDE}Usuário $user_sel removido.${COR_RESET}"
                 sleep 1.5
                 ;;
@@ -260,25 +268,11 @@ gerenciar_usuarios() {
                     nova_data=$(date -d "+$novos_dias days" +"%Y-%m-%d")
                     chage -E "$nova_data" "$user_sel"
 
-                    linha=$(grep "\"usuario\": \"$user_sel\"" "$DB_PMESP")
-                    s=$(echo "$linha" | jq -r .senha)
-                    l=$(echo "$linha" | jq -r .limite)
-                    m=$(echo "$linha" | jq -r .matricula)
-                    e=$(echo "$linha" | jq -r .email)
-                    h=$(echo "$linha" | jq -r .hwid)
-
-                    grep -v "\"usuario\": \"$user_sel\"" "$DB_PMESP" > "${DB_PMESP}.tmp" && mv "${DB_PMESP}.tmp" "$DB_PMESP"
-
-                    jq -n \
-                        --arg u "$user_sel" \
-                        --arg s "$s" \
-                        --arg d "$novos_dias" \
-                        --arg l "$l" \
-                        --arg m "$m" \
-                        --arg e "$e" \
-                        --arg h "$h" \
-                        '{usuario: $u, senha: $s, dias: $d, limite: $l, matricula: $m, email: $e, hwid: $h}' \
-                        >> "$DB_PMESP"
+                    tmp=$(mktemp)
+                    jq -c --arg u "$user_sel" --arg d "$novos_dias" \
+                       'if .usuario == $u then .dias = $d else . end' \
+                       "$DB_PMESP" > "$tmp" && mv "$tmp" "$DB_PMESP"
+                    chmod 666 "$DB_PMESP"
 
                     echo -e "${COR_VERDE}Validade atualizada para $novos_dias dias (até $nova_data).${COR_RESET}"
                     sleep 1.5
@@ -286,9 +280,8 @@ gerenciar_usuarios() {
                 ;;
             3)
                 sessoes=$(who | awk -v user="$user_sel" '$1==user {c++} END {print c+0}')
-                linha=$(grep "\"usuario\": \"$user_sel\"" "$DB_PMESP")
-                limite=$(echo "$linha" | jq -r .limite)
-                [ -z "$limite" ] && limite=0
+                linha=$(jq -c --arg u "$user_sel" 'select(.usuario == $u)' "$DB_PMESP" | head -n1)
+                limite=$(echo "$linha" | jq -r '.limite // "0"')
                 echo -e "Sessões ativas: ${COR_AMARELO}$sessoes${COR_RESET} / Limite configurado: ${COR_AMARELO}$limite${COR_RESET}"
                 read -p "Enter para continuar..." _
                 ;;
@@ -297,6 +290,7 @@ gerenciar_usuarios() {
         esac
     done
 }
+
 
 # --- SISTEMA DE CHAMADOS ---
 novo_chamado() {
